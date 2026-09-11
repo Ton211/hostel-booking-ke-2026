@@ -10,16 +10,23 @@ import {
   serverTimestamp,
 } from 'firebase/firestore';
 import { getFunctions, httpsCallable } from 'firebase/functions';
-import { db } from '../firebase/config';
+import { app, firebaseReady } from '../firebase/config';
 
 const COLLECTION = 'bookings';
-const functions = getFunctions();
+
+function getFunctionsInstance() {
+  if (!firebaseReady || !app) {
+    throw new Error('Firebase is not configured. Please set up your Firebase credentials.');
+  }
+  return getFunctions(app);
+}
 
 function serialize(docSnap) {
   return { id: docSnap.id, ...docSnap.data() };
 }
 
 export async function createBooking(data) {
+  const functions = getFunctionsInstance();
   const createBookingFn = httpsCallable(functions, 'createBooking');
   const result = await createBookingFn(data);
   return result.data;
@@ -108,12 +115,14 @@ export async function getBookingStats(semesterId) {
 }
 
 export async function cancelBooking(bookingId) {
+  const functions = getFunctionsInstance();
   const cancelBookingFn = httpsCallable(functions, 'cancelBooking');
   const result = await cancelBookingFn({ bookingId });
   return result.data;
 }
 
 export async function transferBed(bookingId, newBedId) {
+  const functions = getFunctionsInstance();
   const transferBedFn = httpsCallable(functions, 'transferBed');
   const result = await transferBedFn({ bookingId, newBedId });
   return result.data;

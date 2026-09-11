@@ -9,10 +9,16 @@ import {
   serverTimestamp,
 } from 'firebase/firestore';
 import { getFunctions, httpsCallable } from 'firebase/functions';
-import { db } from '../firebase/config';
+import { app, firebaseReady } from '../firebase/config';
 
 const COLLECTION = 'admins';
-const functions = getFunctions();
+
+function getFunctionsInstance() {
+  if (!firebaseReady || !app) {
+    throw new Error('Firebase is not configured. Please set up your Firebase credentials.');
+  }
+  return getFunctions(app);
+}
 
 function serialize(docSnap) {
   return { id: docSnap.id, ...docSnap.data() };
@@ -34,6 +40,7 @@ export async function getAdmin(uid) {
 }
 
 export async function createAdmin(data) {
+  const functions = getFunctionsInstance();
   const createAdminFn = httpsCallable(functions, 'createAdmin');
   const result = await createAdminFn(data);
   return result.data;
@@ -50,6 +57,7 @@ export async function updateAdmin(uid, data) {
 }
 
 export async function setAdminRole(uid, role) {
+  const functions = getFunctionsInstance();
   const setAdminRoleFn = httpsCallable(functions, 'setAdminRole');
   const result = await setAdminRoleFn({ uid, role });
   return result.data;
