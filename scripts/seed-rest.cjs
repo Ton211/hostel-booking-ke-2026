@@ -149,8 +149,8 @@ const ACCOMMODATION_TYPES = [
   {
     id: 'acc-school-based',
     name: 'School Based',
-    description: 'School-sponsored student rate (per semester)',
-    cost: 4500,
+    description: 'School-based student rate (per month)',
+    price: 4500,
     paymentPerSemester: true,
     features: ['Bed space for one semester', 'School-sponsored pricing'],
     isActive: true,
@@ -159,7 +159,7 @@ const ACCOMMODATION_TYPES = [
     id: 'acc-regular',
     name: 'Regular',
     description: 'Regular student rate (per semester)',
-    cost: 12000,
+    price: 12000,
     paymentPerSemester: true,
     features: ['Bed space for one semester', 'Regular private pricing'],
     isActive: true,
@@ -275,7 +275,7 @@ async function seedDatabase() {
   for (const acc of ACCOMMODATION_TYPES) {
     const { id, ...data } = acc;
     await createDoc('accommodationTypes', id, { ...data, createdAt: now.toISOString(), updatedAt: now.toISOString() });
-    console.log(`   ✅ ${acc.name} - KES ${acc.cost}`);
+    console.log(`   ✅ ${acc.name} - KES ${acc.price}`);
   }
 
   console.log('\n6️⃣  Creating semester...');
