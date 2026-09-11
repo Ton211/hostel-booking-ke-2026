@@ -14,21 +14,21 @@ export default function FilterBar({
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+    <div className="bg-white rounded-xl border border-stone-100 shadow-sm p-4">
       <div className="flex items-center gap-2 mb-3">
-        <Filter className="w-4 h-4 text-gray-400" />
-        <span className="text-sm font-medium text-gray-500">Filters</span>
+        <Filter className="w-4 h-4 text-stone-400" />
+        <span className="text-sm font-medium text-stone-500">Filters</span>
       </div>
       <div className="flex flex-wrap items-center gap-3">
         {typeof onSearchChange === 'function' && (
           <div className="relative flex-1 min-w-[220px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
             <input
               type="text"
               value={searchValue}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder={searchPlaceholder}
-              className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full pl-9 pr-3 py-2 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-clay-500 focus:border-clay-500"
             />
           </div>
         )}
@@ -38,7 +38,7 @@ export default function FilterBar({
             key={f.key}
             value={values[f.key] || ''}
             onChange={(e) => onChange(f.key, e.target.value)}
-            className="py-2 pl-3 pr-8 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white"
+            className="py-2 pl-3 pr-8 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-clay-500 focus:border-clay-500 bg-white"
           >
             <option value="">{f.label}: All</option>
             {f.options.map((o) => (
@@ -51,7 +51,7 @@ export default function FilterBar({
 
         <button
           onClick={clearAll}
-          className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+          className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-stone-600 border border-stone-200 rounded-lg hover:bg-stone-50 transition-colors"
         >
           <X className="w-4 h-4" />
           Clear

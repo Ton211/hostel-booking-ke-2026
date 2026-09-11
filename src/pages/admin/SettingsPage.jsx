@@ -10,8 +10,8 @@ import {
 import { getAllSemesters } from '../../services/semesterService';
 
 const INPUT_CLS =
-  'w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500';
-const LABEL_CLS = 'block text-sm font-medium text-gray-700 mb-1.5';
+  'w-full px-3 py-2 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-clay-500 focus:border-clay-500';
+const LABEL_CLS = 'block text-sm font-medium text-stone-700 mb-1.5';
 
 function saveSection(fields, values, setSaving, reload) {
   return async function handleSave() {
@@ -34,12 +34,12 @@ function saveSection(fields, values, setSaving, reload) {
 function SectionHeader({ icon: Icon, title, subtitle }) {
   return (
     <div className="flex items-center gap-3">
-      <div className="p-2.5 rounded-lg bg-indigo-100 text-indigo-600">
+      <div className="p-2.5 rounded-lg bg-clay-100 text-clay-600">
         <Icon className="w-5 h-5" />
       </div>
       <div>
-        <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
-        <p className="text-xs text-gray-500">{subtitle}</p>
+        <h3 className="text-sm font-semibold text-stone-900">{title}</h3>
+        <p className="text-xs text-stone-500">{subtitle}</p>
       </div>
     </div>
   );
@@ -50,7 +50,7 @@ function SaveButton({ saving }) {
     <button
       type="submit"
       disabled={saving}
-      className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+      className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-clay-600 rounded-lg hover:bg-clay-700 disabled:opacity-50 transition-colors"
     >
       <Save className="w-4 h-4" />
       {saving ? 'Saving...' : 'Save'}
@@ -122,10 +122,10 @@ export default function SettingsPage() {
     return (
       <div className="bg-white rounded-xl border border-red-100 p-14 text-center">
         <ShieldAlert className="w-12 h-12 text-red-400 mx-auto" />
-        <h2 className="mt-4 text-lg font-semibold text-gray-900">
+        <h2 className="mt-4 text-lg font-semibold text-stone-900">
           Access Restricted
         </h2>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-stone-500">
           Only SUPER_ADMIN users can modify system settings.
         </p>
       </div>
@@ -135,8 +135,8 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-3">
-        <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
-        <p className="text-sm text-gray-500">Loading settings...</p>
+        <div className="w-10 h-10 border-4 border-clay-200 border-t-clay-600 rounded-full animate-spin" />
+        <p className="text-sm text-stone-500">Loading settings...</p>
       </div>
     );
   }
@@ -144,8 +144,8 @@ export default function SettingsPage() {
   return (
     <div className="space-y-4 max-w-4xl">
       <div>
-        <h2 className="text-xl font-bold text-gray-900">Settings</h2>
-        <p className="text-sm text-gray-500">
+        <h2 className="text-xl font-bold text-stone-900">Settings</h2>
+        <p className="text-sm text-stone-500">
           Configure system-wide preferences for the hostel portal.
         </p>
       </div>
@@ -159,7 +159,7 @@ export default function SettingsPage() {
             setSavingGeneral
           )();
         }}
-        className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 space-y-4"
+        className="bg-white rounded-xl border border-stone-100 shadow-sm p-6 space-y-4"
       >
         <SectionHeader
           icon={Building2}
@@ -216,7 +216,7 @@ export default function SettingsPage() {
                 placeholder="https://..."
               />
               <label
-                className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer shrink-0"
+                className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-stone-600 border border-stone-200 rounded-lg hover:bg-stone-50 cursor-pointer shrink-0"
                 title="Logo upload"
               >
                 <Download className="w-4 h-4" />
@@ -230,7 +230,7 @@ export default function SettingsPage() {
                     if (file) {
                       const objectUrl = URL.createObjectURL(file);
                       setGeneral({ ...general, logoUrl: objectUrl });
-                      toast.success('Logo selected — will be saved as a URL');
+                      toast.success('Logo selected · will be saved as a URL');
                     }
                   }}
                 />
@@ -252,7 +252,7 @@ export default function SettingsPage() {
             setSavingBooking
           )();
         }}
-        className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 space-y-4"
+        className="bg-white rounded-xl border border-stone-100 shadow-sm p-6 space-y-4"
       >
         <SectionHeader
           icon={CalendarClock}
@@ -271,7 +271,7 @@ export default function SettingsPage() {
               }
               className={INPUT_CLS}
             />
-            <p className="mt-1 text-xs text-gray-400">
+            <p className="mt-1 text-xs text-stone-400">
               How long a pending reservation is held before it expires.
             </p>
           </div>
@@ -291,7 +291,7 @@ export default function SettingsPage() {
                 </option>
               ))}
             </select>
-            <p className="mt-1 text-xs text-gray-400">
+            <p className="mt-1 text-xs text-stone-400">
               Used by the portal as the default active semester.
             </p>
           </div>
@@ -306,7 +306,7 @@ export default function SettingsPage() {
           e.preventDefault();
           saveSection(['systemName'], system, setSavingSystem)();
         }}
-        className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 space-y-4"
+        className="bg-white rounded-xl border border-stone-100 shadow-sm p-6 space-y-4"
       >
         <SectionHeader
           icon={Cog}

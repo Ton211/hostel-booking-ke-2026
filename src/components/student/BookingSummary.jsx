@@ -15,15 +15,15 @@ export default function BookingSummary({ bookingData, onPay, loading, error }) {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-semibold text-gray-800">Booking Summary</h2>
-      <p className="text-sm text-gray-500">Review your booking details before payment</p>
+      <h2 className="text-lg font-semibold text-stone-800">Booking Summary</h2>
+      <p className="text-sm text-stone-500">Review your booking details before payment</p>
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
-        <div className="bg-indigo-600 px-5 py-3">
+      <div className="bg-white rounded-xl border border-stone-200 overflow-hidden shadow-sm">
+        <div className="bg-clay-600 px-5 py-3">
           <h3 className="text-white font-semibold text-sm">Booking Details</h3>
         </div>
 
-        <div className="divide-y divide-gray-100">
+        <div className="divide-y divide-stone-100">
           <SummaryRow
             icon={User}
             label="Student Name"
@@ -71,9 +71,9 @@ export default function BookingSummary({ bookingData, onPay, loading, error }) {
           />
         </div>
 
-        <div className="bg-gray-50 px-5 py-4 border-t border-gray-200">
+        <div className="bg-stone-50 px-5 py-4 border-t border-stone-200">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">Amount to Pay</span>
+            <span className="text-sm text-stone-600">Amount to Pay</span>
             <span className="text-xl font-bold text-emerald-600">
               KSh {Number(accommodationType?.price || 0).toLocaleString()}
             </span>
@@ -91,7 +91,7 @@ export default function BookingSummary({ bookingData, onPay, loading, error }) {
       <button
         onClick={onPay}
         disabled={loading}
-        className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+        className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-clay-600 text-white font-semibold rounded-xl hover:bg-clay-700 focus:ring-4 focus:ring-clay-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
       >
         {loading ? (
           <>
@@ -106,7 +106,7 @@ export default function BookingSummary({ bookingData, onPay, loading, error }) {
         )}
       </button>
 
-      <p className="text-xs text-center text-gray-400">
+      <p className="text-xs text-center text-stone-400">
         You will receive an M-Pesa prompt on {details?.mpesaPhone || 'your phone'} to complete payment
       </p>
     </div>
@@ -116,9 +116,9 @@ export default function BookingSummary({ bookingData, onPay, loading, error }) {
 function SummaryRow({ icon: Icon, label, value }) {
   return (
     <div className="flex items-center gap-3 px-5 py-3">
-      <Icon className="w-4 h-4 text-gray-400 shrink-0" />
-      <span className="text-sm text-gray-500 min-w-[120px]">{label}</span>
-      <span className="text-sm font-medium text-gray-800 text-right flex-1">{value}</span>
+      <Icon className="w-4 h-4 text-stone-400 shrink-0" />
+      <span className="text-sm text-stone-500 min-w-[120px]">{label}</span>
+      <span className="text-sm font-medium text-stone-800 text-right flex-1">{value}</span>
     </div>
   );
 }

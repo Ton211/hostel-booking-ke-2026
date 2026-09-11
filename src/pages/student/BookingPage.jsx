@@ -237,23 +237,23 @@ export default function BookingPage() {
   const showBack = currentStep > 0 && currentStep < 6;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+    <div className="min-h-screen bg-stone-50">
+      <header className="bg-white border-b border-stone-200 sticky top-0 z-10">
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center gap-3">
           {currentStep > 0 && currentStep < 6 && (
             <button
               onClick={goBack}
-              className="p-2 rounded-lg hover:bg-gray-100 transition"
+              className="p-2 rounded-lg hover:bg-stone-100 transition"
             >
-              <ArrowLeft className="w-5 h-5 text-gray-600" />
+              <ArrowLeft className="w-5 h-5 text-stone-600" />
             </button>
           )}
           <div className="flex items-center gap-2">
-            <Bed className="w-5 h-5 text-indigo-600" />
-            <span className="font-semibold text-gray-800 text-sm">Book a Bed</span>
+            <Bed className="w-5 h-5 text-clay-600" />
+            <span className="font-semibold text-stone-800 text-sm">Book a Bed</span>
           </div>
           {currentStep < 6 && (
-            <span className="ml-auto text-xs text-gray-400">
+            <span className="ml-auto text-xs text-stone-400">
               Step {currentStep + 1} of {STEPS.length}
             </span>
           )}
@@ -269,12 +269,12 @@ export default function BookingPage() {
       </main>
 
       {showNavigation && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-10">
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 z-10" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
           <div className="max-w-3xl mx-auto px-4 py-3 flex items-center gap-3">
             {showBack && (
               <button
                 onClick={goBack}
-                className="flex items-center gap-1 px-5 py-3 text-sm font-medium text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition"
+                className="flex items-center gap-1 px-5 py-3 text-sm font-medium text-stone-600 bg-stone-100 rounded-xl hover:bg-stone-200 transition"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back
@@ -283,7 +283,7 @@ export default function BookingPage() {
             {currentStep < 5 && (
               <button
                 onClick={goNext}
-                className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-all duration-200 ${
+                className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-clay-600 text-white font-semibold rounded-xl hover:bg-clay-700 transition-all duration-200 ${
                   !showBack ? 'ml-auto' : ''
                 }`}
               >

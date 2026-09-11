@@ -118,21 +118,21 @@ export default function AccommodationTypesPage() {
   }
 
   const inputCls =
-    'w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500';
-  const labelCls = 'block text-sm font-medium text-gray-700 mb-1.5';
+    'w-full px-3 py-2 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-clay-500 focus:border-clay-500';
+  const labelCls = 'block text-sm font-medium text-stone-700 mb-1.5';
 
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Accommodation Types</h2>
-          <p className="text-sm text-gray-500">
+          <h2 className="text-xl font-bold text-stone-900">Accommodation Types</h2>
+          <p className="text-sm text-stone-500">
             {types.length} types · {types.filter((t) => t.isActive !== false).length} active
           </p>
         </div>
         <button
           onClick={() => setAddOpen(true)}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-clay-600 rounded-lg hover:bg-clay-700 transition-colors"
         >
           <Plus className="w-4 h-4" />
           Add Type
@@ -144,18 +144,18 @@ export default function AccommodationTypesPage() {
           <p className="text-red-600 font-medium">{error}</p>
           <button
             onClick={loadData}
-            className="mt-4 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
+            className="mt-4 px-4 py-2 text-sm font-medium text-white bg-clay-600 rounded-lg hover:bg-clay-700 transition-colors"
           >
             Retry
           </button>
         </div>
       ) : loading ? (
         <div className="flex flex-col items-center justify-center py-24 gap-3">
-          <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
-          <p className="text-sm text-gray-500">Loading accommodation types...</p>
+          <div className="w-10 h-10 border-4 border-clay-200 border-t-clay-600 rounded-full animate-spin" />
+          <p className="text-sm text-stone-500">Loading accommodation types...</p>
         </div>
       ) : types.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-100 p-14 text-center text-gray-400">
+        <div className="bg-white rounded-xl border border-stone-100 p-14 text-center text-stone-400">
           No accommodation types yet. Add your first type to get started.
         </div>
       ) : (
@@ -166,11 +166,11 @@ export default function AccommodationTypesPage() {
               <div
                 key={t.id}
                 className={`bg-white rounded-xl shadow-sm border p-5 transition-opacity ${
-                  active ? 'border-gray-100' : 'border-gray-200 opacity-60'
+                  active ? 'border-stone-100' : 'border-stone-200 opacity-60'
                 }`}
               >
                 <div className="flex items-start justify-between">
-                  <div className="p-2.5 rounded-lg bg-indigo-100 text-indigo-600">
+                  <div className="p-2.5 rounded-lg bg-clay-100 text-clay-600">
                     <Home className="w-5 h-5" />
                   </div>
                   <StatusBadge
@@ -178,11 +178,11 @@ export default function AccommodationTypesPage() {
                     type="admin"
                   />
                 </div>
-                <h3 className="mt-4 font-semibold text-gray-900">{t.name}</h3>
-                <div className="mt-1 text-2xl font-bold text-indigo-600">
+                <h3 className="mt-4 font-semibold text-stone-900">{t.name}</h3>
+                <div className="mt-1 text-2xl font-bold text-clay-600">
                   {fmtMoney(t.price)}
                 </div>
-                <p className="mt-2 text-sm text-gray-500 min-h-[40px]">
+                <p className="mt-2 text-sm text-stone-500 min-h-[40px]">
                   {t.description || 'No description provided.'}
                 </p>
                 <div className="mt-4 flex items-center justify-between">
@@ -195,7 +195,7 @@ export default function AccommodationTypesPage() {
                   </button>
                   <button
                     onClick={() => handleToggleActive(t)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-stone-600 bg-stone-50 rounded-lg hover:bg-stone-100 transition-colors"
                   >
                     <Power className="w-3.5 h-3.5" />
                     {active ? 'Deactivate' : 'Activate'}
@@ -216,14 +216,14 @@ export default function AccommodationTypesPage() {
           <div className="flex justify-end gap-3">
             <button
               onClick={() => setAddOpen(false)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-stone-700 bg-white border border-stone-300 rounded-lg hover:bg-stone-50 transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleAdd}
               disabled={saving}
-              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-white bg-clay-600 rounded-lg hover:bg-clay-700 disabled:opacity-50 transition-colors"
             >
               {saving ? 'Creating...' : 'Create Type'}
             </button>
@@ -278,14 +278,14 @@ export default function AccommodationTypesPage() {
           <div className="flex justify-end gap-3">
             <button
               onClick={() => setEditType(null)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-stone-700 bg-white border border-stone-300 rounded-lg hover:bg-stone-50 transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleEdit}
               disabled={saving}
-              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-white bg-clay-600 rounded-lg hover:bg-clay-700 disabled:opacity-50 transition-colors"
             >
               {saving ? 'Saving...' : 'Save Changes'}
             </button>

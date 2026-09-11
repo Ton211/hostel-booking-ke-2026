@@ -1,7 +1,7 @@
 import { TrendingUp, TrendingDown } from 'lucide-react';
 
 const colorMap = {
-  indigo: 'bg-indigo-100 text-indigo-600',
+  clay: 'bg-clay-100 text-clay-600',
   green: 'bg-green-100 text-green-600',
   red: 'bg-red-100 text-red-600',
   yellow: 'bg-yellow-100 text-yellow-700',
@@ -9,23 +9,23 @@ const colorMap = {
   purple: 'bg-purple-100 text-purple-600',
   pink: 'bg-pink-100 text-pink-600',
   cyan: 'bg-cyan-100 text-cyan-600',
-  gray: 'bg-gray-100 text-gray-600',
+  stone: 'bg-stone-100 text-stone-600',
 };
 
 export default function StatCard({
   title,
   value,
   icon: Icon = null,
-  color = 'indigo',
+  color = 'clay',
   subtitle,
   trend,
 }) {
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+    <div className="bg-white rounded-xl shadow-sm border border-stone-100 p-5">
       <div className="flex items-start justify-between gap-2">
         {Icon && (
           <div
-            className={`inline-flex p-2.5 rounded-lg ${colorMap[color] || colorMap.indigo}`}
+            className={`inline-flex p-2.5 rounded-lg ${colorMap[color] || colorMap.clay}`}
           >
             <Icon className="w-5 h-5" />
           </div>
@@ -46,11 +46,11 @@ export default function StatCard({
         )}
       </div>
       <div className="mt-4">
-        <div className="text-2xl font-bold text-gray-900 leading-tight truncate">
+        <div className="text-2xl font-bold text-stone-900 leading-tight truncate">
           {value}
         </div>
-        <div className="mt-1 text-sm font-medium text-gray-500">{title}</div>
-        {subtitle && <div className="mt-1 text-xs text-gray-400">{subtitle}</div>}
+        <div className="mt-1 text-sm font-medium text-stone-500">{title}</div>
+        {subtitle && <div className="mt-1 text-xs text-stone-400">{subtitle}</div>}
       </div>
     </div>
   );

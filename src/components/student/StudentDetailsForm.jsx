@@ -16,10 +16,10 @@ function formatPhoneForStorage(phone) {
 function FormField({ label, icon: Icon, error, children }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+      <label className="block text-sm font-medium text-stone-700 mb-1">{label}</label>
       <div className="relative">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Icon className="w-5 h-5 text-gray-400" />
+          <Icon className="w-5 h-5 text-stone-400" />
         </div>
         {children}
       </div>
@@ -39,8 +39,8 @@ export default function StudentDetailsForm({ data, onChange, errors }) {
 
   return (
     <div className="space-y-3">
-      <h2 className="text-lg font-semibold text-gray-800">Student Details</h2>
-      <p className="text-sm text-gray-500">Fill in your personal information</p>
+      <h2 className="text-lg font-semibold text-stone-800">Student Details</h2>
+      <p className="text-sm text-stone-500">Fill in your personal information</p>
 
       <div className="space-y-4 mt-4">
         <FormField label="Full Name" icon={User} error={errors?.fullName}>
@@ -49,15 +49,15 @@ export default function StudentDetailsForm({ data, onChange, errors }) {
             value={data.fullName || ''}
             onChange={(e) => handleChange('fullName', e.target.value)}
             placeholder="Enter your full name"
-            className={`w-full pl-10 pr-4 py-3 rounded-lg border text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition ${
-              errors?.fullName ? 'border-red-300 bg-red-50' : 'border-gray-300'
+            className={`w-full pl-10 pr-4 py-3 rounded-lg border text-sm focus:ring-2 focus:ring-clay-500 focus:border-clay-500 outline-none transition ${
+              errors?.fullName ? 'border-red-300 bg-red-50' : 'border-stone-300'
             }`}
           />
         </FormField>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
-          <div className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-600">
+          <label className="block text-sm font-medium text-stone-700 mb-1">Gender</label>
+          <div className="w-full px-4 py-3 rounded-lg border border-stone-200 bg-stone-50 text-sm text-stone-600">
             {data.gender === 'MALE' ? 'Male' : data.gender === 'FEMALE' ? 'Female' : 'Not selected'}
           </div>
         </div>
@@ -68,8 +68,8 @@ export default function StudentDetailsForm({ data, onChange, errors }) {
             value={data.phoneNumber || ''}
             onChange={(e) => handleChange('phoneNumber', e.target.value)}
             placeholder="07XX XXX XXX"
-            className={`w-full pl-10 pr-4 py-3 rounded-lg border text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition ${
-              errors?.phoneNumber ? 'border-red-300 bg-red-50' : 'border-gray-300'
+            className={`w-full pl-10 pr-4 py-3 rounded-lg border text-sm focus:ring-2 focus:ring-clay-500 focus:border-clay-500 outline-none transition ${
+              errors?.phoneNumber ? 'border-red-300 bg-red-50' : 'border-stone-300'
             }`}
           />
         </FormField>
@@ -80,8 +80,8 @@ export default function StudentDetailsForm({ data, onChange, errors }) {
             value={data.nextOfKinName || ''}
             onChange={(e) => handleChange('nextOfKinName', e.target.value)}
             placeholder="Next of kin full name"
-            className={`w-full pl-10 pr-4 py-3 rounded-lg border text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition ${
-              errors?.nextOfKinName ? 'border-red-300 bg-red-50' : 'border-gray-300'
+            className={`w-full pl-10 pr-4 py-3 rounded-lg border text-sm focus:ring-2 focus:ring-clay-500 focus:border-clay-500 outline-none transition ${
+              errors?.nextOfKinName ? 'border-red-300 bg-red-50' : 'border-stone-300'
             }`}
           />
         </FormField>
@@ -92,8 +92,8 @@ export default function StudentDetailsForm({ data, onChange, errors }) {
             value={data.nextOfKinPhone || ''}
             onChange={(e) => handleChange('nextOfKinPhone', e.target.value)}
             placeholder="07XX XXX XXX"
-            className={`w-full pl-10 pr-4 py-3 rounded-lg border text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition ${
-              errors?.nextOfKinPhone ? 'border-red-300 bg-red-50' : 'border-gray-300'
+            className={`w-full pl-10 pr-4 py-3 rounded-lg border text-sm focus:ring-2 focus:ring-clay-500 focus:border-clay-500 outline-none transition ${
+              errors?.nextOfKinPhone ? 'border-red-300 bg-red-50' : 'border-stone-300'
             }`}
           />
         </FormField>
@@ -104,8 +104,8 @@ export default function StudentDetailsForm({ data, onChange, errors }) {
             value={data.mpesaPhone || ''}
             onChange={(e) => handleChange('mpesaPhone', e.target.value)}
             placeholder="07XX XXX XXX"
-            className={`w-full pl-10 pr-4 py-3 rounded-lg border text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition ${
-              errors?.mpesaPhone ? 'border-red-300 bg-red-50' : 'border-gray-300'
+            className={`w-full pl-10 pr-4 py-3 rounded-lg border text-sm focus:ring-2 focus:ring-clay-500 focus:border-clay-500 outline-none transition ${
+              errors?.mpesaPhone ? 'border-red-300 bg-red-50' : 'border-stone-300'
             }`}
           />
         </FormField>

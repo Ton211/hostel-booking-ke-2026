@@ -75,31 +75,31 @@ export default function AdminLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-stone-50">
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-30 bg-gray-900/60 lg:hidden"
+          className="fixed inset-0 z-30 bg-stone-900/60 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-72 bg-indigo-950 text-white transform transition-transform duration-200 lg:translate-x-0 lg:static lg:inset-y-auto lg:h-screen ${
+        className={`fixed inset-y-0 left-0 z-40 w-72 bg-clay-950 text-white transform transition-transform duration-200 lg:translate-x-0 lg:static lg:inset-y-auto lg:h-screen ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         <div className="flex flex-col h-full">
-          <div className="flex items-center gap-3 px-5 h-16 border-b border-indigo-900 shrink-0">
-            <div className="w-9 h-9 rounded-lg bg-indigo-500 flex items-center justify-center">
+          <div className="flex items-center gap-3 px-5 h-16 border-b border-clay-900 shrink-0">
+            <div className="w-9 h-9 rounded-lg bg-clay-500 flex items-center justify-center">
               <Building2 className="w-5 h-5" />
             </div>
             <div className="min-w-0">
               <div className="font-bold leading-tight truncate">Hostel Manager</div>
-              <div className="text-xs text-indigo-300">Admin Console</div>
+              <div className="text-xs text-clay-300">Admin Console</div>
             </div>
             <button
               onClick={() => setSidebarOpen(false)}
-              className="ml-auto lg:hidden text-indigo-300 hover:text-white"
+              className="ml-auto lg:hidden text-clay-300 hover:text-white"
               aria-label="Close sidebar"
             >
               <X className="w-5 h-5" />
@@ -116,8 +116,8 @@ export default function AdminLayout() {
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                     isActive
-                      ? 'bg-indigo-600 text-white shadow'
-                      : 'text-indigo-200 hover:bg-indigo-900 hover:text-white'
+                      ? 'bg-clay-600 text-white shadow'
+                      : 'text-clay-200 hover:bg-clay-900 hover:text-white'
                   }`
                 }
               >
@@ -127,9 +127,9 @@ export default function AdminLayout() {
             ))}
           </nav>
 
-          <div className="px-5 py-4 border-t border-indigo-900 shrink-0">
+          <div className="px-5 py-4 border-t border-clay-900 shrink-0">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-indigo-600 flex items-center justify-center text-sm font-bold uppercase">
+              <div className="w-9 h-9 rounded-full bg-clay-600 flex items-center justify-center text-sm font-bold uppercase">
                 {initial}
               </div>
               <div className="min-w-0 flex-1">
@@ -146,40 +146,40 @@ export default function AdminLayout() {
       </aside>
 
       <div className="lg:pl-72 flex min-h-screen flex-col">
-        <header className="sticky top-0 z-20 bg-white border-b border-gray-200">
+        <header className="sticky top-0 z-20 bg-white border-b border-stone-200">
           <div className="flex items-center gap-4 px-4 sm:px-6 h-16">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 rounded-lg text-gray-500 hover:text-gray-800 hover:bg-gray-100"
+              className="lg:hidden p-2 rounded-lg text-stone-500 hover:text-stone-800 hover:bg-stone-100"
               aria-label="Open sidebar"
             >
               <Menu className="w-5 h-5" />
             </button>
 
             <div className="flex-1 min-w-0">
-              <h1 className="text-lg font-semibold text-gray-900 truncate">
+              <h1 className="text-lg font-semibold text-stone-900 truncate">
                 {activeItem?.label || 'Dashboard'}
               </h1>
-              <p className="text-xs text-gray-500 truncate">
+              <p className="text-xs text-stone-500 truncate">
                 Manage your hostel bookings and operations
               </p>
             </div>
 
             <div className="flex items-center gap-3">
               <div className="hidden sm:block text-right">
-                <div className="text-sm font-medium text-gray-900 truncate max-w-[160px]">
+                <div className="text-sm font-medium text-stone-900 truncate max-w-[160px]">
                   {name}
                 </div>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-stone-500">
                   {currentUser?.email || 'Administrator'}
                 </div>
               </div>
-              <div className="w-9 h-9 rounded-full bg-indigo-600 text-white flex items-center justify-center text-sm font-bold uppercase">
+              <div className="w-9 h-9 rounded-full bg-clay-600 text-white flex items-center justify-center text-sm font-bold uppercase">
                 {initial}
               </div>
               <button
                 onClick={handleLogout}
-                className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
+                className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-stone-600 border border-stone-200 rounded-lg hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
                 title="Logout"
               >
                 <LogOut className="w-4 h-4" />
@@ -193,8 +193,8 @@ export default function AdminLayout() {
           <Outlet />
         </main>
 
-        <footer className="px-6 py-4 text-xs text-gray-400 border-t border-gray-200">
-          &copy; {new Date().getFullYear()} Hostel Management System — Admin Console
+        <footer className="px-6 py-4 text-xs text-stone-400 border-t border-stone-200">
+          &copy; {new Date().getFullYear()} Hostel Management System · Admin Console
         </footer>
       </div>
     </div>

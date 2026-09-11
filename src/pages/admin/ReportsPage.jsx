@@ -26,7 +26,7 @@ const TABS = [
 ];
 
 function fmtDate(value) {
-  if (!value) return '—';
+  if (!value) return 'N/A';
   if (typeof value === 'object' && typeof value.toDate === 'function')
     return value.toDate().toLocaleDateString();
   const d = new Date(value);
@@ -186,7 +186,7 @@ export default function ReportsPage() {
             id: bed.id,
             room: room.name || room.roomNumber || room.id,
             hostel: room.hostelName || room.hostelId,
-            gender: room.gender || '—',
+            gender: room.gender || 'N/A',
             bedNumber: bed.bedNumber,
             position: bed.position || (bed.bedNumber % 2 === 0 ? 'DOWN' : 'UP'),
           });
@@ -202,11 +202,11 @@ export default function ReportsPage() {
       .map((b) => ({
         id: b.id,
         reference: b.reference,
-        student: b.studentName || b.student?.name || '—',
-        gender: b.studentGender || b.gender || '—',
-        room: b.roomName || b.roomNumber || '—',
-        bed: b.bedName || (b.bedNumber ? `Bed ${b.bedNumber}` : '—'),
-        accommodation: b.accommodationType || '—',
+        student: b.studentName || b.student?.name || 'N/A',
+        gender: b.studentGender || b.gender || 'N/A',
+        room: b.roomName || b.roomNumber || 'N/A',
+        bed: b.bedName || (b.bedNumber ? `Bed ${b.bedNumber}` : 'N/A'),
+        accommodation: b.accommodationType || 'N/A',
         amount: Number(b.amount) || 0,
         status: b.status,
       }));
@@ -407,22 +407,22 @@ export default function ReportsPage() {
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-xl font-bold text-gray-900">Reports</h2>
-        <p className="text-sm text-gray-500">
+        <h2 className="text-xl font-bold text-stone-900">Reports</h2>
+        <p className="text-sm text-stone-500">
           Exportable management reports with full history.
         </p>
       </div>
 
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-        <div className="flex flex-wrap gap-2 bg-white rounded-xl border border-gray-100 shadow-sm p-1.5">
+        <div className="flex flex-wrap gap-2 bg-white rounded-xl border border-stone-100 shadow-sm p-1.5">
           {TABS.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
                 activeTab === tab.id
-                  ? 'bg-indigo-600 text-white shadow'
-                  : 'text-gray-600 hover:bg-gray-50'
+                  ? 'bg-clay-600 text-white shadow'
+                  : 'text-stone-600 hover:bg-stone-50'
               }`}
             >
               {tab.label}
@@ -431,12 +431,12 @@ export default function ReportsPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <label className="flex items-center gap-2 text-sm text-gray-600">
+          <label className="flex items-center gap-2 text-sm text-stone-600">
             <span className="font-medium whitespace-nowrap">Semester:</span>
             <select
               value={semesterId}
               onChange={(e) => setSemesterId(e.target.value)}
-              className="py-2 pl-3 pr-8 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white"
+              className="py-2 pl-3 pr-8 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-clay-500 bg-white"
             >
               {semesters.map((s) => (
                 <option key={s.id} value={s.id}>
@@ -447,7 +447,7 @@ export default function ReportsPage() {
           </label>
           <button
             onClick={() => handleExport('csv')}
-            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-stone-700 bg-white border border-stone-300 rounded-lg hover:bg-stone-50 transition-colors"
           >
             <FileDown className="w-4 h-4" />
             CSV
@@ -474,7 +474,7 @@ export default function ReportsPage() {
           <p className="text-red-600 font-medium">{dataError}</p>
           <button
             onClick={() => loadReportData(semesterId)}
-            className="mt-3 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
+            className="mt-3 px-4 py-2 text-sm font-medium text-white bg-clay-600 rounded-lg hover:bg-clay-700 transition-colors"
           >
             Retry
           </button>
@@ -494,7 +494,7 @@ export default function ReportsPage() {
             title="School Based"
             value={fmtMoney(revenue.schoolRevenue)}
             icon={Download}
-            color="indigo"
+            color="clay"
           />
           <StatCard
             title="Regular"
@@ -502,16 +502,16 @@ export default function ReportsPage() {
             icon={Download}
             color="blue"
           />
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-            <h3 className="text-sm font-medium text-gray-500 mb-3">By Method</h3>
+          <div className="bg-white rounded-xl shadow-sm border border-stone-100 p-5">
+            <h3 className="text-sm font-medium text-stone-500 mb-3">By Method</h3>
             <div className="space-y-2">
               {Object.keys(revenue.methodBreakdown).length === 0 ? (
-                <p className="text-xs text-gray-400">No completed payments</p>
+                <p className="text-xs text-stone-400">No completed payments</p>
               ) : (
                 Object.entries(revenue.methodBreakdown).map(([method, amount]) => (
                   <div key={method} className="flex items-center justify-between text-sm">
-                    <span className="text-gray-700 capitalize">{method}</span>
-                    <span className="font-medium text-gray-900">{fmtMoney(amount)}</span>
+                    <span className="text-stone-700 capitalize">{method}</span>
+                    <span className="font-medium text-stone-900">{fmtMoney(amount)}</span>
                   </div>
                 ))
               )}
@@ -551,43 +551,43 @@ export default function ReportsPage() {
       {activeTab === 'occupancy' &&
         (roomsLoading ? (
           <div className="flex flex-col items-center justify-center py-20 gap-3">
-            <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
-            <p className="text-sm text-gray-500">Loading occupancy...</p>
+            <div className="w-10 h-10 border-4 border-clay-200 border-t-clay-600 rounded-full animate-spin" />
+            <p className="text-sm text-stone-500">Loading occupancy...</p>
           </div>
         ) : (
-          <div className="overflow-x-auto bg-white rounded-xl shadow-sm border border-gray-100">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+          <div className="overflow-x-auto bg-white rounded-xl shadow-sm border border-stone-100">
+            <table className="min-w-full divide-y divide-stone-200">
+              <thead className="bg-stone-50">
                 <tr>
                   {['Room', 'Hostel', 'Gender', 'Capacity', 'Occupied', 'Available', 'Occupancy %'].map((h) => (
-                    <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-stone-500 uppercase tracking-wider">
                       {h}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-stone-100">
                 {rooms.map((r) => (
-                  <tr key={r.id} className="hover:bg-indigo-50/50 transition-colors">
-                    <td className="px-4 py-3 text-sm font-medium text-gray-900">{r.name || r.roomNumber || r.id}</td>
-                    <td className="px-4 py-3 text-sm text-gray-500">{r.hostelName || r.hostelId}</td>
+                  <tr key={r.id} className="hover:bg-clay-50/50 transition-colors">
+                    <td className="px-4 py-3 text-sm font-medium text-stone-900">{r.name || r.roomNumber || r.id}</td>
+                    <td className="px-4 py-3 text-sm text-stone-500">{r.hostelName || r.hostelId}</td>
                     <td className="px-4 py-3 text-sm">
                       <span className={r.gender === 'male' ? 'text-blue-600 font-medium' : 'text-pink-600 font-medium'}>
-                        {(r.gender || '—').toUpperCase()}
+                        {(r.gender || 'N/A').toUpperCase()}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-700">{r.totalBeds}</td>
+                    <td className="px-4 py-3 text-sm text-stone-700">{r.totalBeds}</td>
                     <td className="px-4 py-3 text-sm text-red-600 font-medium">{r.occupied}</td>
                     <td className="px-4 py-3 text-sm text-green-600 font-medium">{r.available}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <div className="w-24 h-2 rounded-full bg-gray-100 overflow-hidden">
+                        <div className="w-24 h-2 rounded-full bg-stone-100 overflow-hidden">
                           <div
-                            className={`h-full rounded-full ${r.totalBeds && r.occupied >= r.totalBeds ? 'bg-red-500' : 'bg-indigo-500'}`}
+                            className={`h-full rounded-full ${r.totalBeds && r.occupied >= r.totalBeds ? 'bg-red-500' : 'bg-clay-500'}`}
                             style={{ width: `${r.totalBeds ? Math.min(100, (r.occupied / r.totalBeds) * 100) : 0}%` }}
                           />
                         </div>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-stone-500">
                           {r.totalBeds ? ((r.occupied / r.totalBeds) * 100).toFixed(0) : 0}%
                         </span>
                       </div>
@@ -603,8 +603,8 @@ export default function ReportsPage() {
       {activeTab === 'students' && !dataError && (
         <DataTable
           columns={[
-            { key: 'reference', label: 'Ref', render: (a) => <span className="font-medium text-indigo-600">{a.reference || '—'}</span> },
-            { key: 'student', label: 'Student', render: (a) => <span className="font-medium text-gray-900">{a.student}</span> },
+            { key: 'reference', label: 'Ref', render: (a) => <span className="font-medium text-clay-600">{a.reference || 'N/A'}</span> },
+            { key: 'student', label: 'Student', render: (a) => <span className="font-medium text-stone-900">{a.student}</span> },
             { key: 'gender', label: 'Gender', render: (a) => <span className="capitalize">{a.gender}</span> },
             { key: 'room', label: 'Room', render: (a) => a.room },
             { key: 'bed', label: 'Bed', render: (a) => a.bed },
@@ -622,12 +622,12 @@ export default function ReportsPage() {
       {activeTab === 'payments' && !dataError && (
         <DataTable
           columns={[
-            { key: 'studentName', label: 'Student', render: (p) => <span className="font-medium text-gray-900">{p.studentName || '—'}</span> },
-            { key: 'bookingRef', label: 'Booking Ref', render: (p) => <span className="font-medium text-indigo-600">{p.bookingReference || p.bookingId || '—'}</span> },
-            { key: 'room', label: 'Room', render: (p) => p.roomName || p.roomNumber || '—' },
-            { key: 'bed', label: 'Bed', render: (p) => p.bedName || (p.bedNumber ? `Bed ${p.bedNumber}` : '—') },
+            { key: 'studentName', label: 'Student', render: (p) => <span className="font-medium text-stone-900">{p.studentName || 'N/A'}</span> },
+            { key: 'bookingRef', label: 'Booking Ref', render: (p) => <span className="font-medium text-clay-600">{p.bookingReference || p.bookingId || 'N/A'}</span> },
+            { key: 'room', label: 'Room', render: (p) => p.roomName || p.roomNumber || 'N/A' },
+            { key: 'bed', label: 'Bed', render: (p) => p.bedName || (p.bedNumber ? `Bed ${p.bedNumber}` : 'N/A') },
             { key: 'amount', label: 'Amount', sortable: true, render: (p) => fmtMoney(p.amount) },
-            { key: 'receipt', label: 'Receipt', render: (p) => p.receiptNumber || p.mpesaReceipt || p.reference || '—' },
+            { key: 'receipt', label: 'Receipt', render: (p) => p.receiptNumber || p.mpesaReceipt || p.reference || 'N/A' },
             { key: 'createdAt', label: 'Date', render: (p) => fmtDate(p.createdAt) },
             { key: 'status', label: 'Status', render: (p) => <StatusBadge status={p.status} type="payment" /> },
           ]}
@@ -641,7 +641,7 @@ export default function ReportsPage() {
       {activeTab === 'revenue' && !dataError && (
         <DataTable
           columns={[
-            { key: 'type', label: 'Revenue Type', render: (r) => <span className="font-medium text-gray-900">{r.type}</span> },
+            { key: 'type', label: 'Revenue Type', render: (r) => <span className="font-medium text-stone-900">{r.type}</span> },
             { key: 'amount', label: 'Amount', sortable: true, render: (r) => fmtMoney(r.amount) },
           ]}
           data={[
@@ -657,11 +657,11 @@ export default function ReportsPage() {
       {activeTab === 'availableBeds' && !dataError && (
         <DataTable
           columns={[
-            { key: 'room', label: 'Room', render: (b) => <span className="font-medium text-gray-900">{b.room}</span> },
+            { key: 'room', label: 'Room', render: (b) => <span className="font-medium text-stone-900">{b.room}</span> },
             { key: 'hostel', label: 'Hostel', render: (b) => b.hostel },
             { key: 'gender', label: 'Gender', render: (b) => <span className="capitalize">{b.gender}</span> },
             { key: 'bedNumber', label: 'Bed Number', sortable: true, render: (b) => `Bed ${b.bedNumber}` },
-            { key: 'position', label: 'Position', render: (b) => <span className="text-gray-700">{b.position}</span> },
+            { key: 'position', label: 'Position', render: (b) => <span className="text-stone-700">{b.position}</span> },
           ]}
           data={availableBeds}
           loading={roomsLoading}

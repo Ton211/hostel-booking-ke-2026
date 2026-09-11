@@ -18,7 +18,7 @@ import { getAvailableBeds } from '../../services/bedService';
 import { getAllTypes } from '../../services/accommodationService';
 
 function fmtDate(value) {
-  if (!value) return '—';
+  if (!value) return 'N/A';
   if (typeof value === 'object' && typeof value.toDate === 'function')
     return value.toDate().toLocaleDateString();
   const d = new Date(value);
@@ -26,7 +26,7 @@ function fmtDate(value) {
 }
 
 function fmtDateTime(value) {
-  if (!value) return '—';
+  if (!value) return 'N/A';
   if (typeof value === 'object' && typeof value.toDate === 'function')
     return value.toDate().toLocaleString();
   const d = new Date(value);
@@ -217,7 +217,7 @@ export default function BookingsPage() {
       key: 'reference',
       label: 'Ref',
       render: (b) => (
-        <span className="font-semibold text-indigo-600">{b.reference || '—'}</span>
+        <span className="font-semibold text-clay-600">{b.reference || 'N/A'}</span>
       ),
     },
     {
@@ -225,8 +225,8 @@ export default function BookingsPage() {
       label: 'Student',
       render: (b) => (
         <div>
-          <div className="font-medium text-gray-900">{b.studentName || '—'}</div>
-          <div className="text-xs text-gray-400">{b.studentRegNo || b.studentId || ''}</div>
+          <div className="font-medium text-stone-900">{b.studentName || 'N/A'}</div>
+          <div className="text-xs text-stone-400">{b.studentRegNo || b.studentId || ''}</div>
         </div>
       ),
     },
@@ -240,24 +240,24 @@ export default function BookingsPage() {
               ? 'text-blue-600'
               : (b.studentGender || b.gender) === 'female'
               ? 'text-pink-600'
-              : 'text-gray-500'
+              : 'text-stone-500'
           }`}
         >
-          {(b.studentGender || b.gender || '—').toUpperCase()}
+          {(b.studentGender || b.gender || 'N/A').toUpperCase()}
         </span>
       ),
     },
     {
       key: 'room',
       label: 'Room',
-      render: (b) => b.roomName || b.roomNumber || b.hostelId || '—',
+      render: (b) => b.roomName || b.roomNumber || b.hostelId || 'N/A',
     },
     {
       key: 'bed',
       label: 'Bed',
-      render: (b) => b.bedName || (b.bedNumber ? `Bed ${b.bedNumber}` : '—'),
+      render: (b) => b.bedName || (b.bedNumber ? `Bed ${b.bedNumber}` : 'N/A'),
     },
-    { key: 'accommodationType', label: 'Accommodation', render: (b) => b.accommodationType || '—' },
+    { key: 'accommodationType', label: 'Accommodation', render: (b) => b.accommodationType || 'N/A' },
     {
       key: 'amount',
       label: 'Amount',
@@ -279,7 +279,7 @@ export default function BookingsPage() {
       key: 'createdAt',
       label: 'Date',
       sortable: true,
-      render: (b) => <span className="text-gray-500">{fmtDate(b.createdAt)}</span>,
+      render: (b) => <span className="text-stone-500">{fmtDate(b.createdAt)}</span>,
     },
     {
       key: 'actions',
@@ -294,7 +294,7 @@ export default function BookingsPage() {
                 e.stopPropagation();
                 setDetail(b);
               }}
-              className="p-1.5 rounded-lg text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
+              className="p-1.5 rounded-lg text-stone-500 hover:text-clay-600 hover:bg-clay-50 transition-colors"
               title="View details"
             >
               <Eye className="w-4 h-4" />
@@ -305,7 +305,7 @@ export default function BookingsPage() {
                   e.stopPropagation();
                   setCancelTarget(b);
                 }}
-                className="p-1.5 rounded-lg text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors"
+                className="p-1.5 rounded-lg text-stone-500 hover:text-red-600 hover:bg-red-50 transition-colors"
                 title="Cancel booking"
               >
                 <XCircle className="w-4 h-4" />
@@ -317,7 +317,7 @@ export default function BookingsPage() {
                   e.stopPropagation();
                   openTransfer(b);
                 }}
-                className="p-1.5 rounded-lg text-gray-500 hover:text-purple-600 hover:bg-purple-50 transition-colors"
+                className="p-1.5 rounded-lg text-stone-500 hover:text-purple-600 hover:bg-purple-50 transition-colors"
                 title="Transfer bed"
               >
                 <ArrowLeftRight className="w-4 h-4" />
@@ -368,8 +368,8 @@ export default function BookingsPage() {
   ];
 
   const inputCls =
-    'w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white';
-  const labelCls = 'block text-sm font-medium text-gray-700 mb-1.5';
+    'w-full px-3 py-2 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-clay-500 bg-white';
+  const labelCls = 'block text-sm font-medium text-stone-700 mb-1.5';
 
   const infoItems = (b) => [
     ['Reference', b.reference],
@@ -393,15 +393,15 @@ export default function BookingsPage() {
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Bookings</h2>
-          <p className="text-sm text-gray-500">{bookings.length} bookings</p>
+          <h2 className="text-xl font-bold text-stone-900">Bookings</h2>
+          <p className="text-sm text-stone-500">{bookings.length} bookings</p>
         </div>
-        <label className="flex items-center gap-2 text-sm text-gray-600">
+        <label className="flex items-center gap-2 text-sm text-stone-600">
           <span className="font-medium whitespace-nowrap">Semester:</span>
           <select
             value={semesterId}
             onChange={(e) => setSemesterId(e.target.value)}
-            className="py-2 pl-3 pr-8 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white"
+            className="py-2 pl-3 pr-8 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-clay-500 bg-white"
           >
             {semesters.map((s) => (
               <option key={s.id} value={s.id}>
@@ -426,7 +426,7 @@ export default function BookingsPage() {
           <p className="text-red-600 font-medium">{error}</p>
           <button
             onClick={() => loadData(semesterId)}
-            className="mt-4 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
+            className="mt-4 px-4 py-2 text-sm font-medium text-white bg-clay-600 rounded-lg hover:bg-clay-700 transition-colors"
           >
             Retry
           </button>
@@ -465,7 +465,7 @@ export default function BookingsPage() {
               )}
             <button
               onClick={() => setDetail(null)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-stone-700 bg-white border border-stone-300 rounded-lg hover:bg-stone-50 transition-colors"
             >
               Close
             </button>
@@ -475,8 +475,8 @@ export default function BookingsPage() {
         {detail && (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {infoItems(detail).map(([k, v]) => (
-              <div key={k} className="bg-gray-50 rounded-lg p-3">
-                <div className="text-xs text-gray-500">{k}</div>
+              <div key={k} className="bg-stone-50 rounded-lg p-3">
+                <div className="text-xs text-stone-500">{k}</div>
                 {k === 'Status' ? (
                   <StatusBadge status={v || detail.status} type="booking" />
                 ) : k === 'Payment' ? (
@@ -485,16 +485,16 @@ export default function BookingsPage() {
                     type="payment"
                   />
                 ) : (
-                  <div className="text-sm font-medium text-gray-900">
-                    {v || '—'}
+                  <div className="text-sm font-medium text-stone-900">
+                    {v || 'N/A'}
                   </div>
                 )}
               </div>
             ))}
             {detail.schoolBased !== undefined && (
-              <div className="bg-gray-50 rounded-lg p-3">
-                <div className="text-xs text-gray-500">School Based</div>
-                <div className="text-sm font-medium text-gray-900">
+              <div className="bg-stone-50 rounded-lg p-3">
+                <div className="text-xs text-stone-500">School Based</div>
+                <div className="text-sm font-medium text-stone-900">
                   {detail.schoolBased ? 'Yes' : 'No'}
                 </div>
               </div>
@@ -524,14 +524,14 @@ export default function BookingsPage() {
           <div className="flex justify-end gap-3">
             <button
               onClick={() => setTransferTarget(null)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-stone-700 bg-white border border-stone-300 rounded-lg hover:bg-stone-50 transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleTransfer}
               disabled={transferBusy || !transferBedId}
-              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-4 py-2 text-sm font-medium text-white bg-clay-600 rounded-lg hover:bg-clay-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {transferBusy ? 'Transferring...' : 'Confirm Transfer'}
             </button>
@@ -539,14 +539,14 @@ export default function BookingsPage() {
         }
       >
         <div className="space-y-4">
-          <div className="bg-gray-50 rounded-lg p-4 text-sm">
-            <div className="text-xs text-gray-500 mb-1">From</div>
-            <div className="font-semibold text-gray-900">
-              {transferTarget?.roomName || transferTarget?.roomNumber || '—'} ·{' '}
+          <div className="bg-stone-50 rounded-lg p-4 text-sm">
+            <div className="text-xs text-stone-500 mb-1">From</div>
+            <div className="font-semibold text-stone-900">
+              {transferTarget?.roomName || transferTarget?.roomNumber || 'N/A'} ·{' '}
               {transferTarget?.bedName ||
                 (transferTarget?.bedNumber
                   ? `Bed ${transferTarget.bedNumber}`
-                  : '—')}
+                  : 'N/A')}
             </div>
           </div>
           <div>
@@ -555,7 +555,7 @@ export default function BookingsPage() {
               <option value="">Select room with available beds</option>
               {rooms.map((r) => (
                 <option key={r.id} value={r.id}>
-                  {r.name || r.roomNumber} — {r.availableBeds} available
+                  {r.name || r.roomNumber} · {r.availableBeds} available
                 </option>
               ))}
             </select>

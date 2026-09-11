@@ -13,11 +13,11 @@ export default function BookingConfirmation({ confirmationData, onBackToHome }) 
         <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald-100 mb-4">
           <CheckCircle className="w-12 h-12 text-emerald-600" />
         </div>
-        <h2 className="text-2xl font-bold text-gray-800">BOOKING CONFIRMED</h2>
-        <p className="text-sm text-gray-500 mt-2">Your hostel bed has been booked successfully</p>
+        <h2 className="text-2xl font-bold text-stone-800">BOOKING CONFIRMED</h2>
+        <p className="text-sm text-stone-500 mt-2">Your hostel bed has been booked successfully</p>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+      <div className="bg-white rounded-xl border border-stone-200 overflow-hidden shadow-sm">
         <div className="bg-emerald-600 px-5 py-3 flex items-center gap-2">
           <Hash className="w-4 h-4 text-emerald-100" />
           <span className="text-white font-semibold text-sm">
@@ -25,7 +25,7 @@ export default function BookingConfirmation({ confirmationData, onBackToHome }) 
           </span>
         </div>
 
-        <div className="divide-y divide-gray-100">
+        <div className="divide-y divide-stone-100">
           <ConfirmRow icon={User} label="Student" value={confirmationData.studentName || 'N/A'} />
           <ConfirmRow icon={User} label="Phone" value={confirmationData.studentPhone || 'N/A'} />
           <ConfirmRow
@@ -68,14 +68,14 @@ export default function BookingConfirmation({ confirmationData, onBackToHome }) 
       <div className="flex flex-col sm:flex-row gap-3">
         <button
           onClick={handlePrint}
-          className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-white border-2 border-indigo-500 text-indigo-600 font-semibold rounded-xl hover:bg-indigo-50 transition-all duration-200"
+          className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-white border-2 border-clay-500 text-clay-600 font-semibold rounded-xl hover:bg-clay-50 transition-all duration-200"
         >
           <Printer className="w-5 h-5" />
           Print Confirmation
         </button>
         <button
           onClick={onBackToHome}
-          className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-all duration-200"
+          className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-clay-600 text-white font-semibold rounded-xl hover:bg-clay-700 transition-all duration-200"
         >
           <Home className="w-5 h-5" />
           Back to Home
@@ -88,9 +88,9 @@ export default function BookingConfirmation({ confirmationData, onBackToHome }) 
 function ConfirmRow({ icon: Icon, label, value }) {
   return (
     <div className="flex items-center gap-3 px-5 py-3">
-      <Icon className="w-4 h-4 text-gray-400 shrink-0" />
-      <span className="text-sm text-gray-500 min-w-[120px]">{label}</span>
-      <span className="text-sm font-medium text-gray-800 text-right flex-1">{value}</span>
+      <Icon className="w-4 h-4 text-stone-400 shrink-0" />
+      <span className="text-sm text-stone-500 min-w-[120px]">{label}</span>
+      <span className="text-sm font-medium text-stone-800 text-right flex-1">{value}</span>
     </div>
   );
 }

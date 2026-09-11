@@ -16,7 +16,7 @@ import { getRoomsWithAvailability } from '../../services/roomService';
 import { getAvailableBeds } from '../../services/bedService';
 
 function fmtDate(value) {
-  if (!value) return '—';
+  if (!value) return 'N/A';
   if (typeof value === 'object' && typeof value.toDate === 'function')
     return value.toDate().toLocaleDateString();
   const d = new Date(value);
@@ -223,12 +223,12 @@ export default function StudentsPage() {
       label: 'Name',
       render: (s) => (
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-bold uppercase">
+          <div className="w-8 h-8 rounded-full bg-clay-100 text-clay-600 flex items-center justify-center text-xs font-bold uppercase">
             {(s.fullName || '?').charAt(0)}
           </div>
           <div>
-            <div className="font-medium text-gray-900">{s.fullName || '—'}</div>
-            <div className="text-xs text-gray-400">
+            <div className="font-medium text-stone-900">{s.fullName || 'N/A'}</div>
+            <div className="text-xs text-stone-400">
               {s.registrationNumber || s.email || ''}
             </div>
           </div>
@@ -245,14 +245,14 @@ export default function StudentsPage() {
               ? 'text-blue-600'
               : s.gender === 'female'
               ? 'text-pink-600'
-              : 'text-gray-500'
+              : 'text-stone-500'
           }`}
         >
-          {(s.gender || '—').toUpperCase()}
+          {(s.gender || 'N/A').toUpperCase()}
         </span>
       ),
     },
-    { key: 'phone', label: 'Phone', render: (s) => s.phone || '—' },
+    { key: 'phone', label: 'Phone', render: (s) => s.phone || 'N/A' },
     {
       key: 'nok',
       label: 'Next of Kin',
@@ -261,8 +261,8 @@ export default function StudentsPage() {
           s.nextOfKin || (typeof s.nok === 'string' ? { name: s.nok } : s.nok);
         return (
           <div>
-            <div className="text-gray-900">{nok?.name || '—'}</div>
-            <div className="text-xs text-gray-400">{nok?.phone || ''}</div>
+            <div className="text-stone-900">{nok?.name || 'N/A'}</div>
+            <div className="text-xs text-stone-400">{nok?.phone || ''}</div>
           </div>
         );
       },
@@ -273,7 +273,7 @@ export default function StudentsPage() {
       sortable: true,
       render: (s) => (
         <span className="inline-flex items-center gap-1">
-          <span className="font-semibold text-gray-900">{s.bookingsCount}</span>
+          <span className="font-semibold text-stone-900">{s.bookingsCount}</span>
           {s.hasActiveBooking && (
             <StatusBadge status="active" type="booking" />
           )}
@@ -291,7 +291,7 @@ export default function StudentsPage() {
               e.stopPropagation();
               openDetail(s);
             }}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-clay-600 bg-clay-50 rounded-lg hover:bg-clay-100 transition-colors"
           >
             <Eye className="w-3.5 h-3.5" />
             View
@@ -334,14 +334,14 @@ export default function StudentsPage() {
   ];
 
   const inputCls =
-    'w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500';
-  const labelCls = 'block text-sm font-medium text-gray-700 mb-1.5';
+    'w-full px-3 py-2 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-clay-500 focus:border-clay-500';
+  const labelCls = 'block text-sm font-medium text-stone-700 mb-1.5';
 
   const bookingCols = [
-    { key: 'reference', label: 'Ref', render: (b) => <span className="font-medium text-indigo-600">{b.reference || '—'}</span> },
-    { key: 'roomName', label: 'Room', render: (b) => b.roomName || b.roomNumber || b.hostelId || '—' },
-    { key: 'bed', label: 'Bed', render: (b) => b.bedName || (b.bedNumber ? `Bed ${b.bedNumber}` : '—') },
-    { key: 'accommodationType', label: 'Accommodation', render: (b) => b.accommodationType || '—' },
+    { key: 'reference', label: 'Ref', render: (b) => <span className="font-medium text-clay-600">{b.reference || 'N/A'}</span> },
+    { key: 'roomName', label: 'Room', render: (b) => b.roomName || b.roomNumber || b.hostelId || 'N/A' },
+    { key: 'bed', label: 'Bed', render: (b) => b.bedName || (b.bedNumber ? `Bed ${b.bedNumber}` : 'N/A') },
+    { key: 'accommodationType', label: 'Accommodation', render: (b) => b.accommodationType || 'N/A' },
     { key: 'amount', label: 'Amount', sortable: true, render: (b) => fmtMoney(b.amount) },
     { key: 'status', label: 'Status', render: (b) => <StatusBadge status={b.status} type="booking" /> },
     { key: 'createdAt', label: 'Date', render: (b) => fmtDate(b.createdAt) },
@@ -351,15 +351,15 @@ export default function StudentsPage() {
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Students</h2>
-          <p className="text-sm text-gray-500">{students.length} students</p>
+          <h2 className="text-xl font-bold text-stone-900">Students</h2>
+          <p className="text-sm text-stone-500">{students.length} students</p>
         </div>
-        <label className="flex items-center gap-2 text-sm text-gray-600">
+        <label className="flex items-center gap-2 text-sm text-stone-600">
           <span className="font-medium whitespace-nowrap">Semester:</span>
           <select
             value={semesterId}
             onChange={(e) => setSemesterId(e.target.value)}
-            className="py-2 pl-3 pr-8 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white"
+            className="py-2 pl-3 pr-8 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-clay-500 bg-white"
           >
             {semesters.map((s) => (
               <option key={s.id} value={s.id}>
@@ -384,7 +384,7 @@ export default function StudentsPage() {
           <p className="text-red-600 font-medium">{error}</p>
           <button
             onClick={() => loadStudents(semesterId)}
-            className="mt-4 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
+            className="mt-4 px-4 py-2 text-sm font-medium text-white bg-clay-600 rounded-lg hover:bg-clay-700 transition-colors"
           >
             Retry
           </button>
@@ -422,7 +422,7 @@ export default function StudentsPage() {
             )}
             <button
               onClick={() => setDetail(null)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-stone-700 bg-white border border-stone-300 rounded-lg hover:bg-stone-50 transition-colors"
             >
               Close
             </button>
@@ -430,19 +430,19 @@ export default function StudentsPage() {
         }
       >
         {detailLoading && !detail ? (
-          <div className="py-10 text-center text-sm text-gray-400">Loading...</div>
+          <div className="py-10 text-center text-sm text-stone-400">Loading...</div>
         ) : detail ? (
           <div className="space-y-6">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl font-bold uppercase">
+              <div className="w-14 h-14 rounded-full bg-clay-100 text-clay-600 flex items-center justify-center text-xl font-bold uppercase">
                 {(detail.fullName || '?').charAt(0)}
               </div>
               <div>
-                <div className="text-lg font-semibold text-gray-900">
+                <div className="text-lg font-semibold text-stone-900">
                   {detail.fullName}
                 </div>
-                <div className="text-sm text-gray-500">
-                  {detail.registrationNumber || ''} · {detail.gender || '—'}
+                <div className="text-sm text-stone-500">
+                  {detail.registrationNumber || ''} · {detail.gender || 'N/A'}
                 </div>
               </div>
             </div>
@@ -458,13 +458,13 @@ export default function StudentsPage() {
                   'Next of Kin',
                   detail.nextOfKin
                     ? `${detail.nextOfKin.name || ''}${detail.nextOfKin.phone ? ` (${detail.nextOfKin.phone})` : ''}`
-                    : '—',
+                    : 'N/A',
                 ],
               ].map(([k, v]) => (
-                <div key={k} className="bg-gray-50 rounded-lg p-3">
-                  <div className="text-xs text-gray-500">{k}</div>
-                  <div className="text-sm font-medium text-gray-900">
-                    {v || '—'}
+                <div key={k} className="bg-stone-50 rounded-lg p-3">
+                  <div className="text-xs text-stone-500">{k}</div>
+                  <div className="text-sm font-medium text-stone-900">
+                    {v || 'N/A'}
                   </div>
                 </div>
               ))}
@@ -477,30 +477,30 @@ export default function StudentsPage() {
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
                   <div>
-                    <div className="text-gray-500 text-xs">Reference</div>
-                    <div className="font-medium text-gray-900">
-                      {detail.latestBooking.reference || '—'}
+                    <div className="text-stone-500 text-xs">Reference</div>
+                    <div className="font-medium text-stone-900">
+                      {detail.latestBooking.reference || 'N/A'}
                     </div>
                   </div>
                   <div>
-                    <div className="text-gray-500 text-xs">Room</div>
-                    <div className="font-medium text-gray-900">
+                    <div className="text-stone-500 text-xs">Room</div>
+                    <div className="font-medium text-stone-900">
                       {detail.latestBooking.roomName ||
                         detail.latestBooking.roomNumber ||
-                        '—'}
+                        'N/A'}
                     </div>
                   </div>
                   <div>
-                    <div className="text-gray-500 text-xs">Bed</div>
-                    <div className="font-medium text-gray-900">
+                    <div className="text-stone-500 text-xs">Bed</div>
+                    <div className="font-medium text-stone-900">
                       {detail.latestBooking.bedName ||
                         (detail.latestBooking.bedNumber
                           ? `Bed ${detail.latestBooking.bedNumber}`
-                          : '—')}
+                          : 'N/A')}
                     </div>
                   </div>
                   <div>
-                    <div className="text-gray-500 text-xs">Status</div>
+                    <div className="text-stone-500 text-xs">Status</div>
                     <StatusBadge
                       status={detail.latestBooking.status}
                       type="booking"
@@ -511,7 +511,7 @@ export default function StudentsPage() {
             )}
 
             <div>
-              <h4 className="text-sm font-semibold text-gray-700 mb-2">
+              <h4 className="text-sm font-semibold text-stone-700 mb-2">
                 Booking History
               </h4>
               <DataTable
@@ -523,7 +523,7 @@ export default function StudentsPage() {
             </div>
 
             <div>
-              <h4 className="text-sm font-semibold text-gray-700 mb-2">
+              <h4 className="text-sm font-semibold text-stone-700 mb-2">
                 Payment History
               </h4>
               <DataTable
@@ -532,8 +532,8 @@ export default function StudentsPage() {
                     key: 'receipt',
                     label: 'Receipt',
                     render: (p) => (
-                      <span className="font-medium text-gray-900">
-                        {p.receiptNumber || p.mpesaReceipt || p.reference || '—'}
+                      <span className="font-medium text-stone-900">
+                        {p.receiptNumber || p.mpesaReceipt || p.reference || 'N/A'}
                       </span>
                     ),
                   },
@@ -568,20 +568,20 @@ export default function StudentsPage() {
       <Modal
         isOpen={!!transferTarget}
         onClose={() => setTransferTarget(null)}
-        title={`Transfer Bed — ${transferTarget?.fullName || ''}`}
+        title={`Transfer Bed · ${transferTarget?.fullName || ''}`}
         size="md"
         footer={
           <div className="flex justify-end gap-3">
             <button
               onClick={() => setTransferTarget(null)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-stone-700 bg-white border border-stone-300 rounded-lg hover:bg-stone-50 transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleTransfer}
               disabled={transferBusy || !transferBedId}
-              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-4 py-2 text-sm font-medium text-white bg-clay-600 rounded-lg hover:bg-clay-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {transferBusy ? 'Transferring...' : 'Confirm Transfer'}
             </button>
@@ -590,18 +590,18 @@ export default function StudentsPage() {
       >
         <div className="space-y-4">
           {transferTarget?.latestBooking && (
-            <div className="bg-gray-50 rounded-lg p-4 text-sm">
-              <div className="text-xs text-gray-500 mb-1">From</div>
-              <div className="font-semibold text-gray-900">
+            <div className="bg-stone-50 rounded-lg p-4 text-sm">
+              <div className="text-xs text-stone-500 mb-1">From</div>
+              <div className="font-semibold text-stone-900">
                 {transferTarget.latestBooking.roomName ||
                   transferTarget.latestBooking.roomNumber ||
-                  '—'}{' '}
+                  'N/A'}{' '}
                 ·{' '}
                 {transferTarget.latestBooking.bedName ||
                   (transferTarget.latestBooking.bedNumber
                     ? `Bed ${transferTarget.latestBooking.bedNumber}`
-                    : '—')}{' '}
-                <span className="text-gray-400">
+                    : 'N/A')}{' '}
+                <span className="text-stone-400">
                   ({transferTarget.latestBooking.reference})
                 </span>
               </div>
@@ -617,7 +617,7 @@ export default function StudentsPage() {
               <option value="">Select room with available beds</option>
               {rooms.map((r) => (
                 <option key={r.id} value={r.id}>
-                  {r.name || r.roomNumber} — {r.availableBeds} available
+                  {r.name || r.roomNumber} · {r.availableBeds} available
                 </option>
               ))}
             </select>

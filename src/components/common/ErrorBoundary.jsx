@@ -51,18 +51,18 @@ class ErrorBoundary extends React.Component {
                 />
               </svg>
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            <h2 className="text-xl font-semibold text-stone-900 mb-2">
               Something went wrong
             </h2>
-            <p className="text-gray-500 mb-4">
+            <p className="text-stone-500 mb-4">
               An unexpected error occurred. Please try again.
             </p>
             {process.env.NODE_ENV === 'development' && this.state.error && (
               <details className="mb-4 text-left">
-                <summary className="cursor-pointer text-sm text-gray-500 hover:text-gray-700">
+                <summary className="cursor-pointer text-sm text-stone-500 hover:text-stone-700">
                   Error details
                 </summary>
-                <pre className="mt-2 p-3 bg-gray-100 rounded text-xs text-red-600 overflow-auto">
+                <pre className="mt-2 p-3 bg-stone-100 rounded text-xs text-red-600 overflow-auto">
                   {this.state.error?.toString()}
                   {this.state.errorInfo?.componentStack}
                 </pre>

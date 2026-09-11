@@ -37,16 +37,16 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-stone-50 px-4">
       <div className="w-full max-w-md animate-slide-up">
         <div className="text-center mb-8">
-          <div className="mx-auto w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+          <div className="mx-auto w-16 h-16 bg-clay-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
             <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Hostel Management System</h1>
-          <p className="text-gray-500 mt-2">Sign in to your admin account</p>
+          <h1 className="text-2xl font-bold text-stone-900">Hostel Management System</h1>
+          <p className="text-stone-500 mt-2">Sign in to your admin account</p>
         </div>
 
         <div className="card">
@@ -105,7 +105,7 @@ export default function LoginPage() {
           </form>
         </div>
 
-        <p className="text-center text-sm text-gray-400 mt-6">
+        <p className="text-center text-sm text-stone-400 mt-6">
           &copy; {new Date().getFullYear()} Hostel Management System
         </p>
       </div>

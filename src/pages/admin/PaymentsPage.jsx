@@ -21,7 +21,7 @@ import { getPayments } from '../../services/paymentService';
 import { getAllSemesters } from '../../services/semesterService';
 
 function fmtDate(value) {
-  if (!value) return '—';
+  if (!value) return 'N/A';
   if (typeof value === 'object' && typeof value.toDate === 'function')
     return value.toDate().toLocaleDateString();
   const d = new Date(value);
@@ -29,7 +29,7 @@ function fmtDate(value) {
 }
 
 function fmtDateTime(value) {
-  if (!value) return '—';
+  if (!value) return 'N/A';
   if (typeof value === 'object' && typeof value.toDate === 'function')
     return value.toDate().toLocaleString();
   const d = new Date(value);
@@ -199,8 +199,8 @@ export default function PaymentsPage() {
       label: 'Student',
       render: (p) => (
         <div>
-          <div className="font-medium text-gray-900">{p.studentName || '—'}</div>
-          <div className="text-xs text-gray-400">{p.studentPhone || ''}</div>
+          <div className="font-medium text-stone-900">{p.studentName || 'N/A'}</div>
+          <div className="text-xs text-stone-400">{p.studentPhone || ''}</div>
         </div>
       ),
     },
@@ -208,35 +208,35 @@ export default function PaymentsPage() {
       key: 'bookingRef',
       label: 'Booking Ref',
       render: (p) => (
-        <span className="font-medium text-indigo-600">
-          {p.bookingReference || p.bookingRef || '—'}
+        <span className="font-medium text-clay-600">
+          {p.bookingReference || p.bookingRef || 'N/A'}
         </span>
       ),
     },
-    { key: 'room', label: 'Room', render: (p) => p.roomName || p.roomNumber || '—' },
-    { key: 'bed', label: 'Bed', render: (p) => p.bedName || (p.bedNumber ? `Bed ${p.bedNumber}` : '—') },
+    { key: 'room', label: 'Room', render: (p) => p.roomName || p.roomNumber || 'N/A' },
+    { key: 'bed', label: 'Bed', render: (p) => p.bedName || (p.bedNumber ? `Bed ${p.bedNumber}` : 'N/A') },
     {
       key: 'accommodationType',
       label: 'Accommodation',
-      render: (p) => p.accommodationType || '—',
+      render: (p) => p.accommodationType || 'N/A',
     },
     {
       key: 'amount',
       label: 'Amount',
       sortable: true,
-      render: (p) => <span className="font-medium text-gray-900">{fmtMoney(p.amount)}</span>,
+      render: (p) => <span className="font-medium text-stone-900">{fmtMoney(p.amount)}</span>,
     },
     {
       key: 'phone',
       label: 'Phone',
-      render: (p) => p.phone || p.studentPhone || '—',
+      render: (p) => p.phone || p.studentPhone || 'N/A',
     },
     {
       key: 'receipt',
       label: 'M-Pesa Receipt',
       render: (p) => (
-        <span className="text-gray-700">
-          {p.receiptNumber || p.mpesaReceipt || p.reference || '—'}
+        <span className="text-stone-700">
+          {p.receiptNumber || p.mpesaReceipt || p.reference || 'N/A'}
         </span>
       ),
     },
@@ -244,7 +244,7 @@ export default function PaymentsPage() {
       key: 'createdAt',
       label: 'Date',
       sortable: true,
-      render: (p) => <span className="text-gray-500">{fmtDate(p.createdAt)}</span>,
+      render: (p) => <span className="text-stone-500">{fmtDate(p.createdAt)}</span>,
     },
     {
       key: 'status',
@@ -262,7 +262,7 @@ export default function PaymentsPage() {
             e.stopPropagation();
             setDetail(p);
           }}
-          className="p-1.5 rounded-lg text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
+          className="p-1.5 rounded-lg text-stone-500 hover:text-clay-600 hover:bg-clay-50 transition-colors"
           title="View details"
         >
           <Eye className="w-4 h-4" />
@@ -289,16 +289,16 @@ export default function PaymentsPage() {
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Payments</h2>
-          <p className="text-sm text-gray-500">{payments.length} payments</p>
+          <h2 className="text-xl font-bold text-stone-900">Payments</h2>
+          <p className="text-sm text-stone-500">{payments.length} payments</p>
         </div>
         <div className="flex items-center gap-3">
-          <label className="flex items-center gap-2 text-sm text-gray-600">
+          <label className="flex items-center gap-2 text-sm text-stone-600">
             <span className="font-medium whitespace-nowrap">Semester:</span>
             <select
               value={semesterId}
               onChange={(e) => setSemesterId(e.target.value)}
-              className="py-2 pl-3 pr-8 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white"
+              className="py-2 pl-3 pr-8 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-clay-500 bg-white"
             >
               {semesters.map((s) => (
                 <option key={s.id} value={s.id}>
@@ -309,7 +309,7 @@ export default function PaymentsPage() {
           </label>
           <button
             onClick={exportCSV}
-            className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-stone-700 bg-white border border-stone-300 rounded-lg hover:bg-stone-50 transition-colors"
           >
             <Download className="w-4 h-4" />
             CSV
@@ -355,27 +355,27 @@ export default function PaymentsPage() {
         />
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex flex-wrap items-end gap-3">
+      <div className="bg-white rounded-xl border border-stone-100 shadow-sm p-4 flex flex-wrap items-end gap-3">
         <div>
-          <label className="block text-xs font-medium text-gray-500 mb-1">
+          <label className="block text-xs font-medium text-stone-500 mb-1">
             Date From
           </label>
           <input
             type="date"
             value={filters.dateFrom}
             onChange={(e) => handleChange('dateFrom', e.target.value)}
-            className="py-2 px-3 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white"
+            className="py-2 px-3 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-clay-500 bg-white"
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-gray-500 mb-1">
+          <label className="block text-xs font-medium text-stone-500 mb-1">
             Date To
           </label>
           <input
             type="date"
             value={filters.dateTo}
             onChange={(e) => handleChange('dateTo', e.target.value)}
-            className="py-2 px-3 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white"
+            className="py-2 px-3 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-clay-500 bg-white"
           />
         </div>
         <FilterBar
@@ -393,7 +393,7 @@ export default function PaymentsPage() {
           <p className="text-red-600 font-medium">{error}</p>
           <button
             onClick={() => loadData(semesterId)}
-            className="mt-4 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
+            className="mt-4 px-4 py-2 text-sm font-medium text-white bg-clay-600 rounded-lg hover:bg-clay-700 transition-colors"
           >
             Retry
           </button>
@@ -418,7 +418,7 @@ export default function PaymentsPage() {
           <div className="flex justify-end">
             <button
               onClick={() => setDetail(null)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-stone-700 bg-white border border-stone-300 rounded-lg hover:bg-stone-50 transition-colors"
             >
               Close
             </button>
@@ -442,22 +442,22 @@ export default function PaymentsPage() {
                 ['Date', fmtDateTime(detail.createdAt)],
                 ['Payment ID', detail.id],
               ].map(([k, v]) => (
-                <div key={k} className="bg-gray-50 rounded-lg p-3">
-                  <div className="text-xs text-gray-500">{k}</div>
+                <div key={k} className="bg-stone-50 rounded-lg p-3">
+                  <div className="text-xs text-stone-500">{k}</div>
                   {k === 'Status' ? (
                     <StatusBadge status={v} type="payment" />
                   ) : (
-                    <div className="text-sm font-medium text-gray-900 break-all">
-                      {v || '—'}
+                    <div className="text-sm font-medium text-stone-900 break-all">
+                      {v || 'N/A'}
                     </div>
                   )}
                 </div>
               ))}
             </div>
             {detail.transactionId && (
-              <div className="bg-gray-50 rounded-lg p-3 text-sm">
-                <span className="text-gray-500">Transaction ID: </span>
-                <span className="font-medium text-gray-900">
+              <div className="bg-stone-50 rounded-lg p-3 text-sm">
+                <span className="text-stone-500">Transaction ID: </span>
+                <span className="font-medium text-stone-900">
                   {detail.transactionId}
                 </span>
               </div>

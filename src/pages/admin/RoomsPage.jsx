@@ -201,7 +201,7 @@ export default function RoomsPage() {
       key: 'name',
       label: 'Room #',
       render: (r) => (
-        <span className="font-medium text-gray-900">
+        <span className="font-medium text-stone-900">
           {r.name || r.roomNumber || r.id}
         </span>
       ),
@@ -210,7 +210,7 @@ export default function RoomsPage() {
       key: 'hostelName',
       label: 'Hostel',
       render: (r) => (
-        <span className="text-gray-500">{r.hostelName || r.hostelId}</span>
+        <span className="text-stone-500">{r.hostelName || r.hostelId}</span>
       ),
     },
     {
@@ -223,10 +223,10 @@ export default function RoomsPage() {
               ? 'text-blue-600'
               : r.gender === 'female'
               ? 'text-pink-600'
-              : 'text-gray-500'
+              : 'text-stone-500'
           }`}
         >
-          {(r.gender || '—').toUpperCase()}
+          {(r.gender || 'N/A').toUpperCase()}
         </span>
       ),
     },
@@ -267,7 +267,7 @@ export default function RoomsPage() {
               e.stopPropagation();
               toggleExpand(r);
             }}
-            className="p-1.5 rounded-lg text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
+            className="p-1.5 rounded-lg text-stone-500 hover:text-clay-600 hover:bg-clay-50 transition-colors"
             title="View beds"
           >
             {expandedRoomId === r.id ? (
@@ -281,7 +281,7 @@ export default function RoomsPage() {
               e.stopPropagation();
               openEdit(r);
             }}
-            className="p-1.5 rounded-lg text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+            className="p-1.5 rounded-lg text-stone-500 hover:text-blue-600 hover:bg-blue-50 transition-colors"
             title="Edit"
           >
             <Pencil className="w-4 h-4" />
@@ -292,7 +292,7 @@ export default function RoomsPage() {
                 e.stopPropagation();
                 setDeactivateTarget(r);
               }}
-              className="p-1.5 rounded-lg text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors"
+              className="p-1.5 rounded-lg text-stone-500 hover:text-red-600 hover:bg-red-50 transition-colors"
               title="Deactivate"
             >
               <Power className="w-4 h-4" />
@@ -330,21 +330,21 @@ export default function RoomsPage() {
   ];
 
   const inputCls =
-    'w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500';
-  const labelCls = 'block text-sm font-medium text-gray-700 mb-1.5';
+    'w-full px-3 py-2 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-clay-500 focus:border-clay-500';
+  const labelCls = 'block text-sm font-medium text-stone-700 mb-1.5';
 
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Rooms</h2>
-          <p className="text-sm text-gray-500">
+          <h2 className="text-xl font-bold text-stone-900">Rooms</h2>
+          <p className="text-sm text-stone-500">
             {rooms.length} rooms · {rooms.reduce((s, r) => s + r.totalBeds, 0)} beds
           </p>
         </div>
         <button
           onClick={() => setAddOpen(true)}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-clay-600 rounded-lg hover:bg-clay-700 transition-colors"
         >
           <Plus className="w-4 h-4" />
           Add Room
@@ -365,7 +365,7 @@ export default function RoomsPage() {
           <p className="text-red-600 font-medium">{error}</p>
           <button
             onClick={loadData}
-            className="mt-4 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
+            className="mt-4 px-4 py-2 text-sm font-medium text-white bg-clay-600 rounded-lg hover:bg-clay-700 transition-colors"
           >
             Retry
           </button>
@@ -387,19 +387,19 @@ export default function RoomsPage() {
             const room = rooms.find((r) => r.id === expandedRoomId);
             if (!room) return null;
             return (
-              <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-                <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-100">
-                  <span className="text-sm font-semibold text-gray-700">
+              <div className="bg-white rounded-xl border border-stone-100 shadow-sm overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-3 bg-stone-50 border-b border-stone-100">
+                  <span className="text-sm font-semibold text-stone-700">
                     Beds in {room.name || room.roomNumber || room.id}
                   </span>
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-stone-500">
                     {room.available} available · {room.occupied} occupied ·{' '}
                     {room.blocked} blocked
                   </span>
                 </div>
                 <div className="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
                   {room.beds.length === 0 && (
-                    <div className="col-span-full text-sm text-gray-400 py-6 text-center">
+                    <div className="col-span-full text-sm text-stone-400 py-6 text-center">
                       No beds in this room
                     </div>
                   )}
@@ -410,14 +410,14 @@ export default function RoomsPage() {
                         bed.status === 'occupied'
                           ? 'bg-red-50 border-red-200'
                           : bed.status === 'blocked'
-                          ? 'bg-gray-100 border-gray-200'
+                          ? 'bg-stone-100 border-stone-200'
                           : 'bg-green-50 border-green-200'
                       }`}
                     >
-                      <div className="text-sm font-semibold text-gray-800">
+                      <div className="text-sm font-semibold text-stone-800">
                         Bed {bed.bedNumber}
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-stone-500">
                         {bed.position || (bed.bedNumber % 2 === 0 ? 'DOWN' : 'UP')} ·{' '}
                         {bed.status || 'available'}
                       </div>
@@ -439,14 +439,14 @@ export default function RoomsPage() {
           <div className="flex justify-end gap-3">
             <button
               onClick={() => setAddOpen(false)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-stone-700 bg-white border border-stone-300 rounded-lg hover:bg-stone-50 transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleAdd}
               disabled={saving}
-              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-white bg-clay-600 rounded-lg hover:bg-clay-700 disabled:opacity-50 transition-colors"
             >
               {saving ? 'Creating...' : 'Create Room'}
             </button>
@@ -518,14 +518,14 @@ export default function RoomsPage() {
           <div className="flex justify-end gap-3">
             <button
               onClick={() => setEditRoom(null)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-stone-700 bg-white border border-stone-300 rounded-lg hover:bg-stone-50 transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleEditSubmit}
               disabled={saving}
-              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-white bg-clay-600 rounded-lg hover:bg-clay-700 disabled:opacity-50 transition-colors"
             >
               {saving ? 'Saving...' : 'Save Changes'}
             </button>
@@ -583,7 +583,7 @@ export default function RoomsPage() {
               }
               className={inputCls}
             />
-            <p className="mt-1 text-xs text-gray-400">
+            <p className="mt-1 text-xs text-stone-400">
               Updating capacity does not change existing beds.
             </p>
           </div>

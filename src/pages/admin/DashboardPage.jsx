@@ -170,15 +170,15 @@ export default function DashboardPage() {
 
   const statCards = derived
     ? [
-        { title: 'Total Rooms', value: derived.stats.totalRooms, icon: DoorOpen, color: 'indigo' },
+        { title: 'Total Rooms', value: derived.stats.totalRooms, icon: DoorOpen, color: 'clay' },
         { title: 'Total Beds', value: derived.stats.totalBeds, icon: BedDouble, color: 'blue' },
         { title: 'Available Beds', value: derived.stats.availableBeds, icon: CheckCircle2, color: 'green' },
         { title: 'Booked Beds', value: derived.stats.occupiedBeds, icon: BedSingle, color: 'purple' },
         { title: 'Pending Payments', value: derived.pendingPayments, icon: Clock, color: 'yellow' },
-        { title: 'Blocked Beds', value: derived.stats.blockedBeds, icon: Ban, color: 'gray' },
+        { title: 'Blocked Beds', value: derived.stats.blockedBeds, icon: Ban, color: 'stone' },
         { title: 'Total Students', value: derived.totalStudents, icon: Users, color: 'pink' },
         { title: 'Total Revenue', value: fmtMoney(derived.stats.totalRevenue), icon: Banknote, color: 'green' },
-        { title: 'School Based Revenue', value: fmtMoney(derived.schoolRevenue), icon: GraduationCap, color: 'indigo' },
+        { title: 'School Based Revenue', value: fmtMoney(derived.schoolRevenue), icon: GraduationCap, color: 'clay' },
         { title: 'Regular Revenue', value: fmtMoney(derived.regularRevenue), icon: Landmark, color: 'blue' },
       ]
     : [];
@@ -186,8 +186,8 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-32 gap-3">
-        <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
-        <p className="text-sm text-gray-500">Loading dashboard...</p>
+        <div className="w-10 h-10 border-4 border-clay-200 border-t-clay-600 rounded-full animate-spin" />
+        <p className="text-sm text-stone-500">Loading dashboard...</p>
       </div>
     );
   }
@@ -198,7 +198,7 @@ export default function DashboardPage() {
         <p className="text-red-600 font-medium">{error}</p>
         <button
           onClick={() => loadData(semesterId)}
-          className="mt-4 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
+          className="mt-4 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-clay-600 rounded-lg hover:bg-clay-700 transition-colors"
         >
           <RefreshCw className="w-4 h-4" />
           Retry
@@ -209,7 +209,7 @@ export default function DashboardPage() {
 
   if (!derived) {
     return (
-      <div className="bg-white rounded-xl border border-gray-100 p-10 text-center text-gray-500 text-sm">
+      <div className="bg-white rounded-xl border border-stone-100 p-10 text-center text-stone-500 text-sm">
         No data available for the selected semester.
       </div>
     );
@@ -231,17 +231,17 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Dashboard Overview</h2>
-          <p className="text-sm text-gray-500">
+          <h2 className="text-xl font-bold text-stone-900">Dashboard Overview</h2>
+          <p className="text-sm text-stone-500">
             Real-time snapshot of hostel occupancy and revenue.
           </p>
         </div>
-        <label className="flex items-center gap-2 text-sm text-gray-600">
+        <label className="flex items-center gap-2 text-sm text-stone-600">
           <span className="font-medium whitespace-nowrap">Semester:</span>
           <select
             value={semesterId}
             onChange={(e) => setSemesterId(e.target.value)}
-            className="py-2 pl-3 pr-8 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white"
+            className="py-2 pl-3 pr-8 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-clay-500 bg-white"
           >
             {semesters.map((s) => (
               <option key={s.id} value={s.id}>
@@ -259,94 +259,94 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-          <h3 className="text-sm font-semibold text-gray-700 mb-4">Occupancy Rate</h3>
+        <div className="bg-white rounded-xl shadow-sm border border-stone-100 p-5">
+          <h3 className="text-sm font-semibold text-stone-700 mb-4">Occupancy Rate</h3>
           <div className="flex items-end justify-between mb-2">
-            <span className="text-3xl font-bold text-gray-900">
+            <span className="text-3xl font-bold text-stone-900">
               {Number(derived.stats.occupancyRate || 0).toFixed(1)}%
             </span>
-            <span className="text-xs text-gray-400">beds in use</span>
+            <span className="text-xs text-stone-400">beds in use</span>
           </div>
-          <div className="h-3 rounded-full bg-gray-100 overflow-hidden">
+          <div className="h-3 rounded-full bg-stone-100 overflow-hidden">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-indigo-600 transition-all"
+              className="h-full rounded-full bg-clay-600 transition-all"
               style={{ width: `${rate}%` }}
             />
           </div>
-          <div className="mt-4 grid grid-cols-3 text-center border-t border-gray-100 pt-4">
+          <div className="mt-4 grid grid-cols-3 text-center border-t border-stone-100 pt-4">
             <div>
               <div className="text-lg font-bold text-green-600">
                 {derived.stats.availableBeds}
               </div>
-              <div className="text-xs text-gray-400">Available</div>
+              <div className="text-xs text-stone-400">Available</div>
             </div>
             <div>
               <div className="text-lg font-bold text-red-600">
                 {derived.stats.occupiedBeds}
               </div>
-              <div className="text-xs text-gray-400">Booked</div>
+              <div className="text-xs text-stone-400">Booked</div>
             </div>
             <div>
-              <div className="text-lg font-bold text-gray-500">
+              <div className="text-lg font-bold text-stone-500">
                 {derived.stats.blockedBeds}
               </div>
-              <div className="text-xs text-gray-400">Blocked</div>
+              <div className="text-xs text-stone-400">Blocked</div>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-          <h3 className="text-sm font-semibold text-gray-700 mb-4">Gender Breakdown</h3>
-          <div className="text-3xl font-bold text-gray-900">{derived.totalStudents}</div>
-          <div className="text-xs text-gray-400 mb-4">students booked this semester</div>
+        <div className="bg-white rounded-xl shadow-sm border border-stone-100 p-5">
+          <h3 className="text-sm font-semibold text-stone-700 mb-4">Gender Breakdown</h3>
+          <div className="text-3xl font-bold text-stone-900">{derived.totalStudents}</div>
+          <div className="text-xs text-stone-400 mb-4">students booked this semester</div>
           <div className="space-y-3">
             <div>
               <div className="flex justify-between text-sm mb-1">
                 <span className="text-blue-600 font-medium">Male</span>
-                <span className="text-gray-500">{derived.males} ({malePct}%)</span>
+                <span className="text-stone-500">{derived.males} ({malePct}%)</span>
               </div>
-              <div className="h-2 rounded-full bg-gray-100 overflow-hidden">
+              <div className="h-2 rounded-full bg-stone-100 overflow-hidden">
                 <div className="h-full bg-blue-500 rounded-full" style={{ width: `${malePct}%` }} />
               </div>
             </div>
             <div>
               <div className="flex justify-between text-sm mb-1">
                 <span className="text-pink-600 font-medium">Female</span>
-                <span className="text-gray-500">{derived.females} ({femalePct}%)</span>
+                <span className="text-stone-500">{derived.females} ({femalePct}%)</span>
               </div>
-              <div className="h-2 rounded-full bg-gray-100 overflow-hidden">
+              <div className="h-2 rounded-full bg-stone-100 overflow-hidden">
                 <div className="h-full bg-pink-500 rounded-full" style={{ width: `${femalePct}%` }} />
               </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-          <h3 className="text-sm font-semibold text-gray-700 mb-4">
+        <div className="bg-white rounded-xl shadow-sm border border-stone-100 p-5">
+          <h3 className="text-sm font-semibold text-stone-700 mb-4">
             Accommodation Breakdown
           </h3>
-          <div className="text-3xl font-bold text-gray-900">{accomTotal}</div>
-          <div className="text-xs text-gray-400 mb-4">total allocations this semester</div>
+          <div className="text-3xl font-bold text-stone-900">{accomTotal}</div>
+          <div className="text-xs text-stone-400 mb-4">total allocations this semester</div>
           <div className="space-y-3">
             <div>
               <div className="flex justify-between text-sm mb-1">
-                <span className="text-indigo-600 font-medium">School Based</span>
-                <span className="text-gray-500">
+                <span className="text-clay-600 font-medium">School Based</span>
+                <span className="text-stone-500">
                   {derived.schoolStudents} ({schoolPct}%)
                 </span>
               </div>
-              <div className="h-2 rounded-full bg-gray-100 overflow-hidden">
-                <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${schoolPct}%` }} />
+              <div className="h-2 rounded-full bg-stone-100 overflow-hidden">
+                <div className="h-full bg-clay-500 rounded-full" style={{ width: `${schoolPct}%` }} />
               </div>
             </div>
             <div>
               <div className="flex justify-between text-sm mb-1">
                 <span className="text-cyan-600 font-medium">Regular</span>
-                <span className="text-gray-500">
+                <span className="text-stone-500">
                   {derived.regularStudents} ({regularPct}%)
                 </span>
               </div>
-              <div className="h-2 rounded-full bg-gray-100 overflow-hidden">
+              <div className="h-2 rounded-full bg-stone-100 overflow-hidden">
                 <div className="h-full bg-cyan-500 rounded-full" style={{ width: `${regularPct}%` }} />
               </div>
             </div>
@@ -355,9 +355,9 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-          <h3 className="text-sm font-semibold text-gray-700 mb-2">Bed Occupancy</h3>
-          <p className="text-xs text-gray-400 mb-3">
+        <div className="bg-white rounded-xl shadow-sm border border-stone-100 p-5">
+          <h3 className="text-sm font-semibold text-stone-700 mb-2">Bed Occupancy</h3>
+          <p className="text-xs text-stone-400 mb-3">
             Available vs booked vs blocked vs pending bookings
           </p>
           <div className="h-64">
@@ -383,9 +383,9 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-          <h3 className="text-sm font-semibold text-gray-700 mb-2">Revenue by Type</h3>
-          <p className="text-xs text-gray-400 mb-3">School Based vs Regular</p>
+        <div className="bg-white rounded-xl shadow-sm border border-stone-100 p-5">
+          <h3 className="text-sm font-semibold text-stone-700 mb-2">Revenue by Type</h3>
+          <p className="text-xs text-stone-400 mb-3">School Based vs Regular</p>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={derived.revenueBars} barSize={44}>
@@ -400,20 +400,20 @@ export default function DashboardPage() {
               </BarChart>
             </ResponsiveContainer>
           </div>
-          <div className="mt-3 flex justify-between text-xs text-gray-500 border-t border-gray-100 pt-3">
-            <span>School Based: <strong className="text-gray-800">{fmtMoney(derived.schoolRevenue)}</strong></span>
-            <span>Regular: <strong className="text-gray-800">{fmtMoney(derived.regularRevenue)}</strong></span>
+          <div className="mt-3 flex justify-between text-xs text-stone-500 border-t border-stone-100 pt-3">
+            <span>School Based: <strong className="text-stone-800">{fmtMoney(derived.schoolRevenue)}</strong></span>
+            <span>Regular: <strong className="text-stone-800">{fmtMoney(derived.regularRevenue)}</strong></span>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-          <h3 className="text-sm font-semibold text-gray-700 mb-2">
+        <div className="bg-white rounded-xl shadow-sm border border-stone-100 p-5">
+          <h3 className="text-sm font-semibold text-stone-700 mb-2">
             Occupancy Per Room
           </h3>
-          <p className="text-xs text-gray-400 mb-3">Top rooms by occupied beds</p>
+          <p className="text-xs text-stone-400 mb-3">Top rooms by occupied beds</p>
           <div className="h-64">
             {derived.roomBars.length === 0 ? (
-              <div className="h-full flex items-center justify-center text-sm text-gray-400">
+              <div className="h-full flex items-center justify-center text-sm text-stone-400">
                 No rooms available
               </div>
             ) : (

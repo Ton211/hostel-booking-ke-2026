@@ -7,7 +7,7 @@ import { getAuditLogs } from '../../services/auditService';
 import { getAdmins } from '../../services/adminService';
 
 function fmtDateTime(value) {
-  if (!value) return '—';
+  if (!value) return 'N/A';
   if (typeof value === 'object' && typeof value.toDate === 'function')
     return value.toDate().toLocaleString();
   const d = new Date(value);
@@ -156,7 +156,7 @@ export default function AuditLogsPage() {
       label: 'Date / Time',
       sortable: true,
       render: (l) => (
-        <span className="text-gray-600 whitespace-nowrap">
+        <span className="text-stone-600 whitespace-nowrap">
           {fmtDateTime(l.createdAt)}
         </span>
       ),
@@ -166,11 +166,11 @@ export default function AuditLogsPage() {
       label: 'Admin',
       render: (l) => (
         <div>
-          <div className="font-medium text-gray-900">
+          <div className="font-medium text-stone-900">
             {l.performedByName || l.performedBy || 'System'}
           </div>
           {l.performedBy && l.performedByName !== l.performedBy && (
-            <div className="text-xs text-gray-400">{l.performedBy}</div>
+            <div className="text-xs text-stone-400">{l.performedBy}</div>
           )}
         </div>
       ),
@@ -185,8 +185,8 @@ export default function AuditLogsPage() {
       key: 'entityType',
       label: 'Record Type',
       render: (l) => (
-        <span className="text-gray-700 text-xs font-medium uppercase tracking-wide">
-          {l.entityType || '—'}
+        <span className="text-stone-700 text-xs font-medium uppercase tracking-wide">
+          {l.entityType || 'N/A'}
         </span>
       ),
     },
@@ -194,7 +194,7 @@ export default function AuditLogsPage() {
       key: 'entityId',
       label: 'Record ID',
       render: (l) => (
-        <span className="text-gray-500 text-xs break-all">{l.entityId || '—'}</span>
+        <span className="text-stone-500 text-xs break-all">{l.entityId || 'N/A'}</span>
       ),
     },
     {
@@ -208,11 +208,11 @@ export default function AuditLogsPage() {
             .join(': ');
         return (
           <div>
-            <div className="text-gray-700 line-clamp-2 max-w-[280px]">
-              {text || '—'}
+            <div className="text-stone-700 line-clamp-2 max-w-[280px]">
+              {text || 'N/A'}
             </div>
             {l.entityName && (
-              <div className="text-xs text-gray-400">{l.entityName}</div>
+              <div className="text-xs text-stone-400">{l.entityName}</div>
             )}
           </div>
         );
@@ -223,33 +223,33 @@ export default function AuditLogsPage() {
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-xl font-bold text-gray-900">Audit Logs</h2>
-        <p className="text-sm text-gray-500">
+        <h2 className="text-xl font-bold text-stone-900">Audit Logs</h2>
+        <p className="text-sm text-stone-500">
           {logs.length} recorded actions · newest first
         </p>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex flex-wrap items-end gap-3">
+      <div className="bg-white rounded-xl border border-stone-100 shadow-sm p-4 flex flex-wrap items-end gap-3">
         <div>
-          <label className="block text-xs font-medium text-gray-500 mb-1">
+          <label className="block text-xs font-medium text-stone-500 mb-1">
             Date From
           </label>
           <input
             type="date"
             value={filters.dateFrom}
             onChange={(e) => handleChange('dateFrom', e.target.value)}
-            className="py-2 px-3 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white"
+            className="py-2 px-3 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-clay-500 bg-white"
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-gray-500 mb-1">
+          <label className="block text-xs font-medium text-stone-500 mb-1">
             Date To
           </label>
           <input
             type="date"
             value={filters.dateTo}
             onChange={(e) => handleChange('dateTo', e.target.value)}
-            className="py-2 px-3 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white"
+            className="py-2 px-3 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-clay-500 bg-white"
           />
         </div>
         <div className="flex-1 min-w-full lg:min-w-0">
@@ -269,7 +269,7 @@ export default function AuditLogsPage() {
           <p className="text-red-600 font-medium">{error}</p>
           <button
             onClick={loadData}
-            className="mt-4 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
+            className="mt-4 px-4 py-2 text-sm font-medium text-white bg-clay-600 rounded-lg hover:bg-clay-700 transition-colors"
           >
             Retry
           </button>

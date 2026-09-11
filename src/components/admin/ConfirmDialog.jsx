@@ -39,7 +39,7 @@ export default function ConfirmDialog({
           <button
             onClick={onClose}
             disabled={busy}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            className="px-4 py-2 text-sm font-medium text-stone-700 bg-white border border-stone-300 rounded-lg hover:bg-stone-50 disabled:opacity-50 transition-colors"
           >
             Cancel
           </button>
@@ -49,7 +49,7 @@ export default function ConfirmDialog({
             className={`px-4 py-2 text-sm font-medium text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors ${
               isDanger
                 ? 'bg-red-600 hover:bg-red-700'
-                : 'bg-indigo-600 hover:bg-indigo-700'
+                : 'bg-clay-600 hover:bg-clay-700'
             }`}
           >
             {busy ? 'Processing...' : confirmText}
@@ -60,12 +60,12 @@ export default function ConfirmDialog({
       <div className="flex items-start gap-4">
         <div
           className={`p-2.5 rounded-full shrink-0 ${
-            isDanger ? 'bg-red-100 text-red-600' : 'bg-indigo-100 text-indigo-600'
+            isDanger ? 'bg-red-100 text-red-600' : 'bg-clay-100 text-clay-600'
           }`}
         >
           <AlertTriangle className="w-5 h-5" />
         </div>
-        <p className="text-sm text-gray-600 leading-relaxed pt-1">{message}</p>
+        <p className="text-sm text-stone-600 leading-relaxed pt-1">{message}</p>
       </div>
     </Modal>
   );

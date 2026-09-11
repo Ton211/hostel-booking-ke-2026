@@ -14,7 +14,7 @@ import {
 } from '../../services/semesterService';
 
 function fmtDate(value) {
-  if (!value) return '—';
+  if (!value) return 'N/A';
   if (typeof value === 'object' && typeof value.toDate === 'function')
     return value.toDate().toLocaleDateString();
   const d = new Date(value);
@@ -176,8 +176,8 @@ export default function SemestersPage() {
       label: 'Name',
       render: (s) => (
         <div>
-          <div className="font-semibold text-gray-900">{s.name}</div>
-          <div className="text-xs text-gray-400">{s.id}</div>
+          <div className="font-semibold text-stone-900">{s.name}</div>
+          <div className="text-xs text-stone-400">{s.id}</div>
         </div>
       ),
     },
@@ -220,7 +220,7 @@ export default function SemestersPage() {
               e.stopPropagation();
               openEdit(s);
             }}
-            className="p-1.5 rounded-lg text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+            className="p-1.5 rounded-lg text-stone-500 hover:text-blue-600 hover:bg-blue-50 transition-colors"
             title="Edit"
           >
             <Pencil className="w-4 h-4" />
@@ -232,7 +232,7 @@ export default function SemestersPage() {
                   e.stopPropagation();
                   handleToggleActive(s);
                 }}
-                className="p-1.5 rounded-lg text-gray-500 hover:text-green-600 hover:bg-green-50 transition-colors"
+                className="p-1.5 rounded-lg text-stone-500 hover:text-green-600 hover:bg-green-50 transition-colors"
                 title={s.isActive ? 'Deactivate' : 'Activate'}
               >
                 {s.isActive ? (
@@ -246,7 +246,7 @@ export default function SemestersPage() {
                   e.stopPropagation();
                   setCloseTarget(s);
                 }}
-                className="p-1.5 rounded-lg text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors"
+                className="p-1.5 rounded-lg text-stone-500 hover:text-red-600 hover:bg-red-50 transition-colors"
                 title="Close semester"
               >
                 <Lock className="w-4 h-4" />
@@ -259,19 +259,19 @@ export default function SemestersPage() {
   ];
 
   const inputCls =
-    'w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500';
-  const labelCls = 'block text-sm font-medium text-gray-700 mb-1.5';
+    'w-full px-3 py-2 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-clay-500 focus:border-clay-500';
+  const labelCls = 'block text-sm font-medium text-stone-700 mb-1.5';
 
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Semesters</h2>
-          <p className="text-sm text-gray-500">{semesters.length} semesters</p>
+          <h2 className="text-xl font-bold text-stone-900">Semesters</h2>
+          <p className="text-sm text-stone-500">{semesters.length} semesters</p>
         </div>
         <button
           onClick={() => setAddOpen(true)}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-clay-600 rounded-lg hover:bg-clay-700 transition-colors"
         >
           <Plus className="w-4 h-4" />
           Add Semester
@@ -283,7 +283,7 @@ export default function SemestersPage() {
           <p className="text-red-600 font-medium">{error}</p>
           <button
             onClick={loadData}
-            className="mt-4 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
+            className="mt-4 px-4 py-2 text-sm font-medium text-white bg-clay-600 rounded-lg hover:bg-clay-700 transition-colors"
           >
             Retry
           </button>
@@ -307,14 +307,14 @@ export default function SemestersPage() {
           <div className="flex justify-end gap-3">
             <button
               onClick={() => setAddOpen(false)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-stone-700 bg-white border border-stone-300 rounded-lg hover:bg-stone-50 transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleAdd}
               disabled={saving}
-              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-white bg-clay-600 rounded-lg hover:bg-clay-700 disabled:opacity-50 transition-colors"
             >
               {saving ? 'Creating...' : 'Create Semester'}
             </button>
@@ -385,14 +385,14 @@ export default function SemestersPage() {
           <div className="flex justify-end gap-3">
             <button
               onClick={() => setEditSemester(null)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-stone-700 bg-white border border-stone-300 rounded-lg hover:bg-stone-50 transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleEditSubmit}
               disabled={saving}
-              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-white bg-clay-600 rounded-lg hover:bg-clay-700 disabled:opacity-50 transition-colors"
             >
               {saving ? 'Saving...' : 'Save Changes'}
             </button>

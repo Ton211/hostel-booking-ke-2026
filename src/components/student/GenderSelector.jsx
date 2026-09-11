@@ -28,8 +28,8 @@ export default function GenderSelector({ selected, onSelect }) {
 
   return (
     <div className="space-y-3">
-      <h2 className="text-lg font-semibold text-gray-800">Select Your Gender</h2>
-      <p className="text-sm text-gray-500">Choose your gender to see available rooms</p>
+      <h2 className="text-lg font-semibold text-stone-800">Select Your Gender</h2>
+      <p className="text-sm text-stone-500">Choose your gender to see available rooms</p>
       <div className="grid grid-cols-2 gap-4 mt-4">
         {options.map(({ value, label, icon: Icon, bg, border, ring, text, iconBg }) => {
           const isSelected = selected === value;
@@ -42,23 +42,23 @@ export default function GenderSelector({ selected, onSelect }) {
                 ${
                   isSelected
                     ? `${border} ${bg} ring-4 ${ring} shadow-md`
-                    : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
+                    : 'border-stone-200 bg-white hover:border-stone-300 hover:shadow-sm'
                 }
               `}
             >
               <div
                 className={`flex items-center justify-center w-16 h-16 rounded-full ${
-                  isSelected ? iconBg : 'bg-gray-100'
+                  isSelected ? iconBg : 'bg-stone-100'
                 }`}
               >
                 <Icon
-                  className={`w-8 h-8 ${isSelected ? text : 'text-gray-400'}`}
+                  className={`w-8 h-8 ${isSelected ? text : 'text-stone-400'}`}
                   strokeWidth={1.5}
                 />
               </div>
               <span
                 className={`text-base font-semibold ${
-                  isSelected ? text : 'text-gray-600'
+                  isSelected ? text : 'text-stone-600'
                 }`}
               >
                 {label}

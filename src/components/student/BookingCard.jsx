@@ -7,8 +7,8 @@ const STATUS_STYLES = {
   pending: 'bg-amber-100 text-amber-700',
   CANCELLED: 'bg-red-100 text-red-700',
   cancelled: 'bg-red-100 text-red-700',
-  EXPIRED: 'bg-gray-100 text-gray-600',
-  expired: 'bg-gray-100 text-gray-600',
+  EXPIRED: 'bg-stone-100 text-stone-600',
+  expired: 'bg-stone-100 text-stone-600',
   ACTIVE: 'bg-blue-100 text-blue-700',
   active: 'bg-blue-100 text-blue-700',
 };
@@ -20,7 +20,7 @@ const PAYMENT_STYLES = {
   pending: 'bg-amber-100 text-amber-700',
   FAILED: 'bg-red-100 text-red-700',
   failed: 'bg-red-100 text-red-700',
-  EXPIRED: 'bg-gray-100 text-gray-600',
+  EXPIRED: 'bg-stone-100 text-stone-600',
   STK_FAILED: 'bg-red-100 text-red-700',
 };
 
@@ -49,30 +49,30 @@ export default function BookingCard({ booking }) {
   if (!booking) return null;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-      <div className="px-5 py-4 border-b border-gray-100">
+    <div className="bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden">
+      <div className="px-5 py-4 border-b border-stone-100">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <User className="w-5 h-5 text-indigo-500" />
-            <span className="font-semibold text-gray-800">{booking.studentName || 'N/A'}</span>
+            <User className="w-5 h-5 text-clay-500" />
+            <span className="font-semibold text-stone-800">{booking.studentName || 'N/A'}</span>
           </div>
           <span
             className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
-              STATUS_STYLES[booking.bookingStatus || booking.status] || 'bg-gray-100 text-gray-600'
+              STATUS_STYLES[booking.bookingStatus || booking.status] || 'bg-stone-100 text-stone-600'
             }`}
           >
             {formatStatus(booking.bookingStatus || booking.status)}
           </span>
         </div>
         {booking.reference && (
-          <p className="text-xs text-gray-400 mt-1">Ref: {booking.reference}</p>
+          <p className="text-xs text-stone-400 mt-1">Ref: {booking.reference}</p>
         )}
         {booking.bookingReference && (
-          <p className="text-xs text-gray-400 mt-1">Ref: {booking.bookingReference}</p>
+          <p className="text-xs text-stone-400 mt-1">Ref: {booking.bookingReference}</p>
         )}
       </div>
 
-      <div className="px-5 py-3 divide-y divide-gray-50">
+      <div className="px-5 py-3 divide-y divide-stone-50">
         <DetailRow icon={Building2} label="Accommodation" value={booking.accommodationTypeName || booking.accommodationTypeId || 'N/A'} />
         <DetailRow icon={Bed} label="Room" value={booking.roomName || booking.roomId || 'N/A'} />
         <DetailRow
@@ -92,13 +92,13 @@ export default function BookingCard({ booking }) {
         )}
       </div>
 
-      <div className="px-5 py-3 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+      <div className="px-5 py-3 bg-stone-50 border-t border-stone-100 flex items-center justify-between">
         <div className="flex items-center gap-1">
-          <CreditCard className="w-4 h-4 text-gray-400" />
-          <span className="text-xs text-gray-500">Payment:</span>
+          <CreditCard className="w-4 h-4 text-stone-400" />
+          <span className="text-xs text-stone-500">Payment:</span>
           <span
             className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-              PAYMENT_STYLES[booking.paymentStatus] || 'bg-gray-100 text-gray-600'
+              PAYMENT_STYLES[booking.paymentStatus] || 'bg-stone-100 text-stone-600'
             }`}
           >
             {formatStatus(booking.paymentStatus)}
@@ -112,15 +112,15 @@ export default function BookingCard({ booking }) {
       </div>
 
       {booking.mpesaReceipt && (
-        <div className="px-5 py-2 bg-gray-50 border-t border-gray-100">
-          <p className="text-xs text-gray-500">
-            M-Pesa Receipt: <span className="font-mono text-gray-700">{booking.mpesaReceipt}</span>
+        <div className="px-5 py-2 bg-stone-50 border-t border-stone-100">
+          <p className="text-xs text-stone-500">
+            M-Pesa Receipt: <span className="font-mono text-stone-700">{booking.mpesaReceipt}</span>
           </p>
         </div>
       )}
 
-      <div className="px-5 py-2 bg-gray-50 border-t border-gray-100">
-        <p className="text-xs text-gray-400">
+      <div className="px-5 py-2 bg-stone-50 border-t border-stone-100">
+        <p className="text-xs text-stone-400">
           Booked: {formatDate(booking.createdAt)}
         </p>
       </div>
@@ -131,9 +131,9 @@ export default function BookingCard({ booking }) {
 function DetailRow({ icon: Icon, label, value }) {
   return (
     <div className="flex items-center gap-2 py-2">
-      <Icon className="w-4 h-4 text-gray-400 shrink-0" />
-      <span className="text-xs text-gray-500 min-w-[90px]">{label}</span>
-      <span className="text-sm font-medium text-gray-700">{value}</span>
+      <Icon className="w-4 h-4 text-stone-400 shrink-0" />
+      <span className="text-xs text-stone-500 min-w-[90px]">{label}</span>
+      <span className="text-sm font-medium text-stone-700">{value}</span>
     </div>
   );
 }

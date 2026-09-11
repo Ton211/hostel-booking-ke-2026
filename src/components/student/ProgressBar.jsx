@@ -16,8 +16,8 @@ export default function ProgressBar({ steps, currentStep }) {
                   className={`
                     flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full text-sm font-semibold transition-all duration-300 shrink-0
                     ${isCompleted ? 'bg-emerald-600 text-white' : ''}
-                    ${isCurrent ? 'bg-indigo-600 text-white ring-4 ring-indigo-100' : ''}
-                    ${isUpcoming ? 'bg-gray-200 text-gray-500' : ''}
+                    ${isCurrent ? 'bg-clay-600 text-white ring-4 ring-clay-100' : ''}
+                    ${isUpcoming ? 'bg-stone-200 text-stone-500' : ''}
                   `}
                 >
                   {isCompleted ? (
@@ -30,7 +30,7 @@ export default function ProgressBar({ steps, currentStep }) {
                   <div className="flex-1 h-0.5 mx-1 sm:mx-2">
                     <div
                       className={`h-full rounded transition-all duration-300 ${
-                        isCompleted ? 'bg-emerald-600' : 'bg-gray-200'
+                        isCompleted ? 'bg-emerald-600' : 'bg-stone-200'
                       }`}
                     />
                   </div>
@@ -39,9 +39,9 @@ export default function ProgressBar({ steps, currentStep }) {
               <span
                 className={`
                   mt-2 text-[10px] sm:text-xs text-center leading-tight
-                  ${isCurrent ? 'text-indigo-600 font-semibold' : ''}
+                  ${isCurrent ? 'text-clay-600 font-semibold' : ''}
                   ${isCompleted ? 'text-emerald-600 font-medium' : ''}
-                  ${isUpcoming ? 'text-gray-400' : ''}
+                  ${isUpcoming ? 'text-stone-400' : ''}
                 `}
               >
                 {step}

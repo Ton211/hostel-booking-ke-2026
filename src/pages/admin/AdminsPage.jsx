@@ -53,10 +53,10 @@ export default function AdminsPage() {
     return (
       <div className="bg-white rounded-xl border border-red-100 p-14 text-center">
         <ShieldAlert className="w-12 h-12 text-red-400 mx-auto" />
-        <h2 className="mt-4 text-lg font-semibold text-gray-900">
+        <h2 className="mt-4 text-lg font-semibold text-stone-900">
           Access Restricted
         </h2>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-stone-500">
           Only SUPER_ADMIN users can manage administrator accounts.
         </p>
       </div>
@@ -133,24 +133,24 @@ export default function AdminsPage() {
       label: 'Name',
       render: (a) => (
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-bold uppercase">
+          <div className="w-8 h-8 rounded-full bg-clay-100 text-clay-600 flex items-center justify-center text-xs font-bold uppercase">
             {(a.displayName || '?').charAt(0)}
           </div>
           <div>
-            <div className="font-medium text-gray-900">
-              {a.displayName || '—'}
+            <div className="font-medium text-stone-900">
+              {a.displayName || 'N/A'}
               {currentUser?.uid === a.uid && (
-                <span className="ml-2 text-[10px] font-semibold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded-full">
+                <span className="ml-2 text-[10px] font-semibold text-clay-600 bg-clay-50 px-1.5 py-0.5 rounded-full">
                   You
                 </span>
               )}
             </div>
-            <div className="text-xs text-gray-400">{a.uid}</div>
+            <div className="text-xs text-stone-400">{a.uid}</div>
           </div>
         </div>
       ),
     },
-    { key: 'email', label: 'Email', render: (a) => a.email || '—' },
+    { key: 'email', label: 'Email', render: (a) => a.email || 'N/A' },
     {
       key: 'role',
       label: 'Role',
@@ -171,7 +171,7 @@ export default function AdminsPage() {
       sortable: false,
       render: (a) =>
         currentUser?.uid === a.uid ? (
-          <span className="text-xs text-gray-400">—</span>
+          <span className="text-xs text-stone-400">·</span>
         ) : (
           <div className="flex items-center gap-1.5">
             <button
@@ -179,7 +179,7 @@ export default function AdminsPage() {
                 e.stopPropagation();
                 openEdit(a);
               }}
-              className="p-1.5 rounded-lg text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+              className="p-1.5 rounded-lg text-stone-500 hover:text-blue-600 hover:bg-blue-50 transition-colors"
               title="Change role"
             >
               <Pencil className="w-4 h-4" />
@@ -190,7 +190,7 @@ export default function AdminsPage() {
                   e.stopPropagation();
                   setDeactivateTarget(a);
                 }}
-                className="p-1.5 rounded-lg text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors"
+                className="p-1.5 rounded-lg text-stone-500 hover:text-red-600 hover:bg-red-50 transition-colors"
                 title="Deactivate"
               >
                 <Power className="w-4 h-4" />
@@ -202,21 +202,21 @@ export default function AdminsPage() {
   ];
 
   const inputCls =
-    'w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500';
-  const labelCls = 'block text-sm font-medium text-gray-700 mb-1.5';
+    'w-full px-3 py-2 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-clay-500 focus:border-clay-500';
+  const labelCls = 'block text-sm font-medium text-stone-700 mb-1.5';
 
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Admins</h2>
-          <p className="text-sm text-gray-500">
+          <h2 className="text-xl font-bold text-stone-900">Admins</h2>
+          <p className="text-sm text-stone-500">
             {admins.length} administrator accounts
           </p>
         </div>
         <button
           onClick={() => setAddOpen(true)}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-clay-600 rounded-lg hover:bg-clay-700 transition-colors"
         >
           <Plus className="w-4 h-4" />
           Add Admin
@@ -228,7 +228,7 @@ export default function AdminsPage() {
           <p className="text-red-600 font-medium">{error}</p>
           <button
             onClick={loadData}
-            className="mt-4 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
+            className="mt-4 px-4 py-2 text-sm font-medium text-white bg-clay-600 rounded-lg hover:bg-clay-700 transition-colors"
           >
             Retry
           </button>
@@ -252,14 +252,14 @@ export default function AdminsPage() {
           <div className="flex justify-end gap-3">
             <button
               onClick={() => setAddOpen(false)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-stone-700 bg-white border border-stone-300 rounded-lg hover:bg-stone-50 transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleAdd}
               disabled={saving}
-              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-white bg-clay-600 rounded-lg hover:bg-clay-700 disabled:opacity-50 transition-colors"
             >
               {saving ? 'Creating...' : 'Create Admin'}
             </button>
@@ -326,14 +326,14 @@ export default function AdminsPage() {
           <div className="flex justify-end gap-3">
             <button
               onClick={() => setEditAdmin(null)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-stone-700 bg-white border border-stone-300 rounded-lg hover:bg-stone-50 transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleEditSave}
               disabled={saving}
-              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-white bg-clay-600 rounded-lg hover:bg-clay-700 disabled:opacity-50 transition-colors"
             >
               {saving ? 'Saving...' : 'Save Role'}
             </button>
@@ -341,9 +341,9 @@ export default function AdminsPage() {
         }
       >
         <div className="space-y-4">
-          <div className="bg-gray-50 rounded-lg p-3 text-sm">
-            <div className="text-xs text-gray-500">Account</div>
-            <div className="font-medium text-gray-900">
+          <div className="bg-stone-50 rounded-lg p-3 text-sm">
+            <div className="text-xs text-stone-500">Account</div>
+            <div className="font-medium text-stone-900">
               {editAdmin?.displayName}
               {editAdmin?.email ? ` · ${editAdmin.email}` : ''}
             </div>

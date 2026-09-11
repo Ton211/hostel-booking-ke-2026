@@ -34,7 +34,7 @@ async function fetchRoomsAndBeds() {
     if (['confirmed', 'active', 'pending'].includes(b.status)) {
       if (b.bedId && !bookingMap[b.bedId]) {
         bookingMap[b.bedId] = {
-          studentName: b.studentName || b.student?.name || '—',
+          studentName: b.studentName || b.student?.name || 'N/A',
           reference: b.reference,
           bookingId: d.id,
           status: b.status,
@@ -230,15 +230,15 @@ export default function BedsPage() {
   ];
 
   const inputCls =
-    'w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500';
-  const labelCls = 'block text-sm font-medium text-gray-700 mb-1.5';
+    'w-full px-3 py-2 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-clay-500 focus:border-clay-500';
+  const labelCls = 'block text-sm font-medium text-stone-700 mb-1.5';
 
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Beds</h2>
-          <p className="text-sm text-gray-500">
+          <h2 className="text-xl font-bold text-stone-900">Beds</h2>
+          <p className="text-sm text-stone-500">
             {allBeds.length} beds across {roomBeds.length} rooms
           </p>
         </div>
@@ -255,7 +255,7 @@ export default function BedsPage() {
           <span className="w-3 h-3 rounded bg-yellow-500" /> Pending
         </span>
         <span className="inline-flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded bg-gray-400" /> Blocked
+          <span className="w-3 h-3 rounded bg-stone-400" /> Blocked
         </span>
       </div>
 
@@ -273,18 +273,18 @@ export default function BedsPage() {
           <p className="text-red-600 font-medium">{error}</p>
           <button
             onClick={loadData}
-            className="mt-4 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
+            className="mt-4 px-4 py-2 text-sm font-medium text-white bg-clay-600 rounded-lg hover:bg-clay-700 transition-colors"
           >
             Retry
           </button>
         </div>
       ) : loading ? (
         <div className="flex flex-col items-center justify-center py-24 gap-3">
-          <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
-          <p className="text-sm text-gray-500">Loading beds...</p>
+          <div className="w-10 h-10 border-4 border-clay-200 border-t-clay-600 rounded-full animate-spin" />
+          <p className="text-sm text-stone-500">Loading beds...</p>
         </div>
       ) : filteredRooms.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-100 p-14 text-center text-gray-400">
+        <div className="bg-white rounded-xl border border-stone-100 p-14 text-center text-stone-400">
           No beds found matching your filters
         </div>
       ) : (
@@ -302,7 +302,7 @@ export default function BedsPage() {
                         position: 'UP',
                       });
                     }}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-clay-600 bg-clay-50 rounded-lg hover:bg-clay-100 transition-colors"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     Add Bed
@@ -317,7 +317,7 @@ export default function BedsPage() {
       <Modal
         isOpen={!!selectedBed}
         onClose={() => setSelectedBed(null)}
-        title={`Bed ${selectedBed?.bedNumber || ''} — Detail`}
+        title={`Bed ${selectedBed?.bedNumber || ''} · Detail`}
         size="md"
         footer={
           <div className="flex justify-end gap-3">
@@ -334,7 +334,7 @@ export default function BedsPage() {
                 ) : (
                   <button
                     onClick={() => handleBlockToggle(selectedBed)}
-                    className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-stone-700 bg-white border border-stone-300 rounded-lg hover:bg-stone-50 transition-colors"
                   >
                     <Ban className="w-4 h-4" />
                     Block Bed
@@ -343,7 +343,7 @@ export default function BedsPage() {
                 <button
                   onClick={handleEditBed}
                   disabled={saving}
-                  className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-white bg-clay-600 rounded-lg hover:bg-clay-700 disabled:opacity-50 transition-colors"
                 >
                   {saving ? 'Saving...' : 'Save Changes'}
                 </button>
@@ -351,7 +351,7 @@ export default function BedsPage() {
             )}
             <button
               onClick={() => setSelectedBed(null)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-stone-700 bg-white border border-stone-300 rounded-lg hover:bg-stone-50 transition-colors"
             >
               Close
             </button>
@@ -361,14 +361,14 @@ export default function BedsPage() {
         {selectedBed && (
           <div className="space-y-4">
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              <div className="bg-gray-50 rounded-lg p-3">
-                <div className="text-xs text-gray-500">Bed Number</div>
-                <div className="font-semibold text-gray-900">
+              <div className="bg-stone-50 rounded-lg p-3">
+                <div className="text-xs text-stone-500">Bed Number</div>
+                <div className="font-semibold text-stone-900">
                   {selectedBed.bedNumber}
                 </div>
               </div>
-              <div className="bg-gray-50 rounded-lg p-3">
-                <div className="text-xs text-gray-500">Position</div>
+              <div className="bg-stone-50 rounded-lg p-3">
+                <div className="text-xs text-stone-500">Position</div>
                 <select
                   value={selectedBed.position || 'UP'}
                   onChange={(e) =>
@@ -378,14 +378,14 @@ export default function BedsPage() {
                     })
                   }
                   disabled={selectedBed.status === 'occupied'}
-                  className="mt-0.5 w-full px-2 py-1 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white disabled:opacity-60"
+                  className="mt-0.5 w-full px-2 py-1 text-sm border border-stone-200 rounded-lg focus:ring-2 focus:ring-clay-500 bg-white disabled:opacity-60"
                 >
                   <option value="UP">UP</option>
                   <option value="DOWN">DOWN</option>
                 </select>
               </div>
-              <div className="bg-gray-50 rounded-lg p-3">
-                <div className="text-xs text-gray-500">Status</div>
+              <div className="bg-stone-50 rounded-lg p-3">
+                <div className="text-xs text-stone-500">Status</div>
                 <StatusBadge status={selectedBed.status} type="bed" />
               </div>
             </div>
@@ -399,19 +399,19 @@ export default function BedsPage() {
                 </div>
                 <dl className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
                   <div>
-                    <dt className="text-gray-500 text-xs">Student</dt>
-                    <dd className="font-medium text-gray-900">
-                      {selectedBed.studentName || '—'}
+                    <dt className="text-stone-500 text-xs">Student</dt>
+                    <dd className="font-medium text-stone-900">
+                      {selectedBed.studentName || 'N/A'}
                     </dd>
                   </div>
                   <div>
-                    <dt className="text-gray-500 text-xs">Reference</dt>
-                    <dd className="font-medium text-gray-900">
-                      {selectedBed.bookingRef || '—'}
+                    <dt className="text-stone-500 text-xs">Reference</dt>
+                    <dd className="font-medium text-stone-900">
+                      {selectedBed.bookingRef || 'N/A'}
                     </dd>
                   </div>
                   <div>
-                    <dt className="text-gray-500 text-xs">Booking Status</dt>
+                    <dt className="text-stone-500 text-xs">Booking Status</dt>
                     <dd>
                       <StatusBadge
                         status={selectedBed.bookingStatus || 'active'}
@@ -420,15 +420,15 @@ export default function BedsPage() {
                     </dd>
                   </div>
                   <div>
-                    <dt className="text-gray-500 text-xs">Booking ID</dt>
-                    <dd className="font-medium text-gray-900 text-xs break-all">
-                      {selectedBed.bookingId || '—'}
+                    <dt className="text-stone-500 text-xs">Booking ID</dt>
+                    <dd className="font-medium text-stone-900 text-xs break-all">
+                      {selectedBed.bookingId || 'N/A'}
                     </dd>
                   </div>
                 </dl>
               </div>
             )}
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-stone-400">
               Occupied beds cannot be blocked or repositioned. Position edits apply
               to all beds.
             </p>
@@ -439,20 +439,20 @@ export default function BedsPage() {
       <Modal
         isOpen={!!addBedRoom}
         onClose={() => setAddBedRoom(null)}
-        title={`Add Bed — ${addBedRoom?.name || addBedRoom?.roomNumber || ''}`}
+        title={`Add Bed · ${addBedRoom?.name || addBedRoom?.roomNumber || ''}`}
         size="sm"
         footer={
           <div className="flex justify-end gap-3">
             <button
               onClick={() => setAddBedRoom(null)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-stone-700 bg-white border border-stone-300 rounded-lg hover:bg-stone-50 transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleAddBed}
               disabled={saving}
-              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-white bg-clay-600 rounded-lg hover:bg-clay-700 disabled:opacity-50 transition-colors"
             >
               {saving ? 'Adding...' : 'Add Bed'}
             </button>
