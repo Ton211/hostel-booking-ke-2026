@@ -25,7 +25,7 @@ export async function getRoomsByHostel(hostelId) {
     collection(db, COLLECTION),
     where('hostelId', '==', hostelId),
     where('isActive', '==', true),
-    orderBy('name', 'asc')
+    orderBy('roomNumber', 'asc')
   );
   const snapshot = await getDocs(q);
   return snapshot.docs.map(serialize);
@@ -36,7 +36,7 @@ export async function getRoomsByGender(gender) {
     collection(db, COLLECTION),
     where('gender', '==', gender),
     where('isActive', '==', true),
-    orderBy('name', 'asc')
+    orderBy('roomNumber', 'asc')
   );
   const snapshot = await getDocs(q);
   return snapshot.docs.map(serialize);
@@ -70,7 +70,8 @@ export async function createRoom(data) {
         roomId: roomRef.id,
         bedNumber: i,
         name: `Bed ${i}`,
-        status: 'available',
+        position: i % 2 === 0 ? 'UP' : 'DOWN',
+        status: 'AVAILABLE',
         isActive: true,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
@@ -106,7 +107,7 @@ export async function getRoomsWithAvailability(semesterId) {
   const roomsQuery = query(
     collection(db, COLLECTION),
     where('isActive', '==', true),
-    orderBy('name', 'asc')
+    orderBy('roomNumber', 'asc')
   );
   const roomsSnapshot = await getDocs(roomsQuery);
   const rooms = roomsSnapshot.docs.map(serialize);
@@ -138,3 +139,4 @@ export async function getRoomsWithAvailability(semesterId) {
 
   return results;
 }
+

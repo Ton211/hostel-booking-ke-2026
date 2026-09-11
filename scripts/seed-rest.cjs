@@ -3,6 +3,14 @@
 /**
  * Seed script using Firestore REST API with Firebase CLI token
  * Reads token from C:\Users\clint\.config\configstore\firebase-tools.json
+ *
+ * Hostel layout:
+ * - 11 rooms total
+ * - Rooms 1-7: GIRLS (FEMALE)
+ * - Rooms 8-11: BOYS (MALE)
+ * - Each room has 2 double-deckers = 4 beds (Bed 1-4)
+ * - Even bed numbers = UP bunk, odd bed numbers = DOWN bunk
+ * - Accommodation: School Based KES 4,500 / Regular KES 12,000 (per semester)
  */
 
 const https = require('https');
@@ -15,7 +23,6 @@ const FIREBASE_TOKEN_PATH = path.join(
   '.config', 'configstore', 'firebase-tools.json'
 );
 
-// Get Firebase CLI access token
 function getAccessToken() {
   try {
     const config = JSON.parse(fs.readFileSync(FIREBASE_TOKEN_PATH, 'utf8'));
@@ -29,12 +36,11 @@ function getAccessToken() {
   return null;
 }
 
-// Firestore REST API helper
 function firestoreRequest(method, path, data) {
   const token = getAccessToken();
   return new Promise((resolve, reject) => {
     const url = new URL(`https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents${path}`);
-    
+
     const options = {
       hostname: url.hostname,
       path: url.pathname + url.search,
@@ -69,12 +75,8 @@ function firestoreRequest(method, path, data) {
   });
 }
 
-// Create a document
-async function createDoc(collection, docId, data) {
-  const docPath = `/${collection}`;
-  const body = {
-    fields: {}
-  };
+function createDoc(collection, docId, data) {
+  const body = { fields: {} };
 
   for (const [key, value] of Object.entries(data)) {
     if (value === null || value === undefined) {
@@ -82,44 +84,48 @@ async function createDoc(collection, docId, data) {
     } else if (typeof value === 'string') {
       body.fields[key] = { stringValue: value };
     } else if (typeof value === 'number') {
-      if (Number.isInteger(value)) {
-        body.fields[key] = { integerValue: value };
-      } else {
-        body.fields[key] = { doubleValue: value };
-      }
+      body.fields[key] = Number.isInteger(value) ? { integerValue: value } : { doubleValue: value };
     } else if (typeof value === 'boolean') {
       body.fields[key] = { booleanValue: value };
     } else if (value instanceof Date) {
       body.fields[key] = { timestampValue: value.toISOString() };
     } else if (Array.isArray(value)) {
-      body.fields[key] = {
-        arrayValue: {
-          values: value.map(v => ({ stringValue: v }))
-        }
-      };
+      body.fields[key] = { arrayValue: { values: value.map(v => ({ stringValue: v })) } };
     } else if (typeof value === 'object') {
-      // Map object to mapValue
       const mapFields = {};
       for (const [k, v] of Object.entries(value)) {
-        if (typeof v === 'string') {
-          mapFields[k] = { stringValue: v };
-        } else if (typeof v === 'number') {
-          mapFields[k] = { integerValue: v };
-        }
+        if (typeof v === 'string') mapFields[k] = { stringValue: v };
+        else if (typeof v === 'number') mapFields[k] = { integerValue: v };
+        else if (typeof v === 'boolean') mapFields[k] = { booleanValue: v };
       }
       body.fields[key] = { mapValue: { fields: mapFields } };
     }
   }
 
-// Use POST to create with documentId
   const url = `/${collection}?documentId=${docId}`;
   return firestoreRequest('POST', url, body);
 }
 
-// Timestamps
+// Delete every document in a collection
+async function deleteCollection(collection) {
+  const url = `/${collection}`;
+  const resp = await firestoreRequest('GET', url);
+  const docs = resp.documents || [];
+  const ids = docs.map((d) => d.name.split('/').pop());
+  if (ids.length === 0) return;
+  const deleteUrl = `:commit`;
+  const body = {
+    writes: ids.map((id) => ({
+      delete: `projects/${PROJECT_ID}/databases/(default)/documents/${collection}/${id}`
+    }))
+  };
+  await firestoreRequest('POST', deleteUrl, body);
+  console.log(`   Deleted ${ids.length} docs from ${collection}`);
+}
+
 const now = new Date();
-const oneYearLater = new Date(now);
-oneYearLater.setFullYear(oneYearLater.getFullYear() + 1);
+const semStart = new Date('2026-09-01T00:00:00Z');
+const semEnd = new Date('2026-12-20T00:00:00Z');
 const oneWeekLater = new Date(now);
 oneWeekLater.setDate(oneWeekLater.getDate() + 7);
 const twoWeeksLater = new Date(now);
@@ -127,106 +133,35 @@ twoWeeksLater.setDate(twoWeeksLater.getDate() + 14);
 
 // ==================== SEED DATA ====================
 
-const HOSPITALITIES_HOSTEL = {
-  name: 'Hospitalities',
-  gender: 'MALE',
-  floors: 4,
-  roomsPerFloor: 3,
-  totalCapacity: 44,
-  description: 'Male hostel with 4 floors, 3 rooms per floor, 4 beds per room',
-  isActive: true,
-};
-
-const BED_POSITIONS = ['UP', 'DOWN'];
-
-const roomTypes = ['NORMAL', 'VIP', 'VVIP'];
-
-// Room numbering: Floor 1 = 101-103, Floor 2 = 201-203, Floor 3 = 301-303, Floor 4 = 401-403
-// Room 101, 102 = VIP (4 floors x 3 rooms = 12 rooms, 2 VIP per floor = 8 VIP, 4 normal)
-// Room 103, 203, 303, 403 = VVIP (4 VVIP)
-// Actually let's do: each floor has rooms X01, X02, X03
-// X01 = NORMAL, X02 = VIP, X03 = VVIP per floor
-const rooms = [];
-const beds = [];
-
-for (let floor = 1; floor <= 4; floor++) {
-  for (let roomIdx = 1; roomIdx <= 3; roomIdx++) {
-    const roomNumber = `${floor}0${roomIdx}`;
-    let roomType, roomCapacity, costPerSemester;
-
-    if (roomIdx === 1) {
-      roomType = 'NORMAL';
-      roomCapacity = 4;
-      costPerSemester = 6500;
-    } else if (roomIdx === 2) {
-      roomType = 'VIP';
-      roomCapacity = 4;
-      costPerSemester = 8000;
-    } else {
-      roomType = 'VVIP';
-      roomCapacity = 4;
-      costPerSemester = 10000;
-    }
-
-    const roomId = `room-${roomNumber}`;
-    rooms.push({
-      id: roomId,
-      roomNumber,
-      floor,
-      type: roomType,
-      capacity: roomCapacity,
-      costPerSemester,
-      isActive: true,
-      hostel: 'Hospitalities',
-      hostelId: 'hosp-001',
-      name: `Room ${roomNumber}`,
-      gender: 'MALE',
-    });
-
-    // Create 4 beds per room
-    for (let bedIdx = 1; bedIdx <= 4; bedIdx++) {
-      const bedId = `bed-${roomNumber}-${bedIdx}`;
-      beds.push({
-        id: bedId,
-        bedNumber: `Bed ${bedIdx}`,
-        roomId,
-        position: BED_POSITIONS[(bedIdx - 1) % 2],
-        status: 'AVAILABLE',
-        isActive: true,
-        hostelId: 'hosp-001',
-        name: `Bed ${bedIdx}`,
-        floor,
-        roomNumber,
-        costPerSemester,
-        type: roomType,
-      });
-    }
-  }
-}
+const HOSTELS = [
+  {
+    id: 'hosp-main',
+    name: 'Hostel',
+    gender: 'MIXED',
+    floors: 1,
+    totalCapacity: 44,
+    description: 'Main hostel: Rooms 1-7 (Girls), Rooms 8-11 (Boys). 4 beds per room.',
+    isActive: true,
+  },
+];
 
 const ACCOMMODATION_TYPES = [
   {
-    id: 'acc-normal',
-    name: 'Normal',
-    description: 'Standard bed space with shared facilities',
-    cost: 6500,
-    features: ['Basic bedding', 'Shared bathroom', 'Wi-Fi'],
+    id: 'acc-school-based',
+    name: 'School Based',
+    description: 'School-sponsored student rate (per semester)',
+    cost: 4500,
+    paymentPerSemester: true,
+    features: ['Bed space for one semester', 'School-sponsored pricing'],
     isActive: true,
   },
   {
-    id: 'acc-vip',
-    name: 'VIP',
-    description: 'Premium bed space with enhanced amenities',
-    cost: 8000,
-    features: ['Premium bedding', 'En-suite bathroom', 'Wi-Fi', 'Study desk'],
-    isActive: true,
-  },
-  {
-    id: 'acc-vvip',
-    name: 'VVIP',
-    description: 'Luxury bed space with top-tier facilities',
-    cost: 10000,
-    features: ['Luxury bedding', 'Private bathroom', 'Wi-Fi', 'Study desk', 'Mini fridge', 'AC'],
+    id: 'acc-regular',
+    name: 'Regular',
+    description: 'Regular student rate (per semester)',
+    cost: 12000,
+    paymentPerSemester: true,
+    features: ['Bed space for one semester', 'Regular private pricing'],
     isActive: true,
   },
 ];
@@ -236,8 +171,8 @@ const SEMESTER = {
   name: 'Semester 1 2026/2027',
   academicYear: '2026/2027',
   semesterNumber: 1,
-  startDate: now.toISOString(),
-  endDate: oneYearLater.toISOString(),
+  startDate: semStart.toISOString(),
+  endDate: semEnd.toISOString(),
   bookingOpen: oneWeekLater.toISOString(),
   bookingDeadline: twoWeeksLater.toISOString(),
   isActive: true,
@@ -245,103 +180,130 @@ const SEMESTER = {
 };
 
 const SETTINGS = [
-  { id: 'general', key: 'general', value: { hostelName: 'KUCCAS Hostel System', contactEmail: 'hostel@ku.ac.ke', contactPhone: '+254700000000' } },
+  { id: 'general', key: 'general', value: { hostelName: 'Hostel Management System', contactEmail: 'hostel@example.com', contactPhone: '+254700000000' } },
   { id: 'payment', key: 'payment', value: { mpesaEnabled: true, mpesaShortcode: '174379', mpesaPasskey: '' } },
   { id: 'booking', key: 'booking', value: { autoApprove: false, maxBookingDays: 7, requirePayment: true } },
   { id: 'notifications', key: 'notifications', value: { emailEnabled: false, smsEnabled: false, pushEnabled: false } },
 ];
 
+// ==================== BUILD ROOMS & BEDS ====================
+
+const rooms = [];
+const beds = [];
+
+// Rooms 1-7: GIRLS, Rooms 8-11: BOYS
+for (let roomNum = 1; roomNum <= 11; roomNum++) {
+  const gender = roomNum <= 7 ? 'FEMALE' : 'MALE';
+
+  const roomId = `room-${roomNum}`;
+  rooms.push({
+    id: roomId,
+    name: `Room ${roomNum}`,
+    roomNumber: roomNum,
+    gender,
+    type: 'NORMAL',
+    capacity: 4,
+    costPerSemester: 4500,
+    hostel: 'Hostel',
+    hostelId: 'hosp-main',
+    isActive: true,
+    floor: 1,
+  });
+
+  // 4 beds per room (2 double-deckers)
+  // Even number beds = UP bunk, odd number beds = DOWN bunk
+  for (let bedNum = 1; bedNum <= 4; bedNum++) {
+    const position = bedNum % 2 === 0 ? 'UP' : 'DOWN';
+
+    const bedId = `bed-${roomId}-${bedNum}`;
+    beds.push({
+      id: bedId,
+      bedNumber: bedNum,
+      name: `Bed ${bedNum}`,
+      roomId,
+      roomName: `Room ${roomNum}`,
+      position,
+      status: 'AVAILABLE',
+      isActive: true,
+      hostelId: 'hosp-main',
+      floor: 1,
+      gender,
+      costPerSemester: 4500,
+    });
+  }
+}
+
 // ==================== SEED FUNCTION ====================
 
 async function seedDatabase() {
-  console.log('🌱 Starting database seed...\n');
+  console.log('🌱 Starting database seed (fresh)...');
 
-  // Step 1: Create hostel
-  console.log('1️⃣  Creating hostel...');
-  await createDoc('hostels', HOSPITALITIES_HOSTEL.id, {
-    ...HOSPITALITIES_HOSTEL,
-    createdAt: now.toISOString(),
-    updatedAt: now.toISOString(),
-  });
-  console.log('   ✅ Created hostel: Hospitalities\n');
+  console.log('\n1️⃣  Clearing existing data...');
+  await deleteCollection('hostels');
+  await deleteCollection('rooms');
+  await deleteCollection('beds');
+  await deleteCollection('accommodationTypes');
+  await deleteCollection('semesters');
+  await deleteCollection('settings');
+  await deleteCollection('bookings');
+  await deleteCollection('payments');
+  await deleteCollection('students');
 
-  // Step 2: Create rooms
-  console.log('2️⃣  Creating rooms...');
+  console.log('\n2️⃣  Creating hostel...');
+  for (const h of HOSTELS) {
+    const { id, ...data } = h;
+    await createDoc('hostels', id, { ...data, createdAt: now.toISOString(), updatedAt: now.toISOString() });
+    console.log(`   ✅ Created hostel: ${h.name} (${h.gender})`);
+  }
+
+  console.log('\n3️⃣  Creating rooms...');
   for (const room of rooms) {
-    const { id, ...roomData } = room;
-    await createDoc('rooms', id, {
-      ...roomData,
-      createdAt: now.toISOString(),
-      updatedAt: now.toISOString(),
-    });
-    console.log(`   ✅ Room ${room.roomNumber} (${room.type})`);
+    const { id, ...data } = room;
+    await createDoc('rooms', id, { ...data, createdAt: now.toISOString(), updatedAt: now.toISOString() });
+    console.log(`   ✅ ${room.name} (${room.gender})`);
   }
-  console.log(`   📊 Total rooms created: ${rooms.length}\n`);
+  console.log(`   📊 Total rooms: ${rooms.length} (1-7 Girls, 8-11 Boys)`);
 
-  // Step 3: Create beds
-  console.log('3️⃣  Creating beds...');
+  console.log('\n4️⃣  Creating beds...');
   for (const bed of beds) {
-    const { id, ...bedData } = bed;
-    await createDoc('beds', id, {
-      ...bedData,
-      createdAt: now.toISOString(),
-      updatedAt: now.toISOString(),
-    });
-    console.log(`   ✅ Bed ${bed.bedNumber} in Room ${bed.roomNumber} (${bed.position}, ${bed.type})`);
+    const { id, ...data } = bed;
+    await createDoc('beds', id, { ...data, createdAt: now.toISOString(), updatedAt: now.toISOString() });
   }
-  console.log(`   📊 Total beds created: ${beds.length}\n`);
+  console.log(`   ✅ Total beds: ${beds.length} (even=UP, odd=DOWN) per room`);
 
-  // Step 4: Create accommodation types
-  console.log('4️⃣  Creating accommodation types...');
-  for (const accType of ACCOMMODATION_TYPES) {
-    const { id, ...accData } = accType;
-    await createDoc('accommodationTypes', id, {
-      ...accData,
-      createdAt: now.toISOString(),
-      updatedAt: now.toISOString(),
-    });
-    console.log(`   ✅ ${accType.name} - KES ${accType.cost}`);
+  console.log('\n5️⃣  Creating accommodation types...');
+  for (const acc of ACCOMMODATION_TYPES) {
+    const { id, ...data } = acc;
+    await createDoc('accommodationTypes', id, { ...data, createdAt: now.toISOString(), updatedAt: now.toISOString() });
+    console.log(`   ✅ ${acc.name} - KES ${acc.cost}`);
   }
-  console.log(`   📊 Total accommodation types: ${ACCOMMODATION_TYPES.length}\n`);
 
-  // Step 5: Create semester
-  console.log('5️⃣  Creating semester...');
+  console.log('\n6️⃣  Creating semester...');
   await createDoc('semesters', SEMESTER.id, {
     ...SEMESTER,
     createdAt: now.toISOString(),
     updatedAt: now.toISOString(),
   });
-  console.log(`   ✅ ${SEMESTER.name}\n`);
+  console.log(`   ✅ ${SEMESTER.name}`);
 
-  // Step 6: Create settings
-  console.log('6️⃣  Creating settings...');
+  console.log('\n7️⃣  Creating settings...');
   for (const setting of SETTINGS) {
-    const { id, ...settingData } = setting;
-    await createDoc('settings', id, {
-      ...settingData,
-      createdAt: now.toISOString(),
-      updatedAt: now.toISOString(),
-    });
-    console.log(`   ✅ Setting: ${setting.key}`);
+    const { id, ...data } = setting;
+    await createDoc('settings', id, { ...data, createdAt: now.toISOString(), updatedAt: now.toISOString() });
   }
-  console.log(`   📊 Total settings: ${SETTINGS.length}\n`);
+  console.log(`   ✅ ${SETTINGS.length} settings`);
 
-  // Summary
   console.log('\n✅ Database seed completed!\n');
   console.log('📊 Summary:');
-  console.log(`   - 1 Hostel (Hospitalities)`);
-  console.log(`   - ${rooms.length} Rooms`);
-  console.log(`   - ${beds.length} Beds`);
-  console.log(`   - ${ACCOMMODATION_TYPES.length} Accommodation Types`);
+  console.log(`   - 1 Hostel`);
+  console.log(`   - ${rooms.length} Rooms (1-7 Girls, 8-11 Boys)`);
+  console.log(`   - ${beds.length} Beds (4 per room, 2 double-deckers)`);
+  console.log(`   - School Based KES 4,500 / Regular KES 12,000`);
   console.log(`   - 1 Semester (2026/2027 Sem 1)`);
-  console.log(`   - ${SETTINGS.length} Settings`);
-  console.log('\n⚠️  Next steps:');
-  console.log('   1. Enable Firebase Authentication in console');
-  console.log('   2. Upgrade to Blaze plan');
-  console.log('   3. Deploy Cloud Functions');
+  console.log(`   - 4 Settings`);
 }
 
 seedDatabase().catch(err => {
-  console.error('❌ Seed failed:', err);
+  console.error('❌ Seed failed:', err.message || err);
   process.exit(1);
 });

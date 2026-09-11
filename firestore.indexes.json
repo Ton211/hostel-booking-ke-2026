@@ -6,7 +6,7 @@
       "fields": [
         { "fieldPath": "gender", "order": "ASCENDING" },
         { "fieldPath": "isActive", "order": "ASCENDING" },
-        { "fieldPath": "name", "order": "ASCENDING" }
+        { "fieldPath": "roomNumber", "order": "ASCENDING" }
       ]
     },
     {
@@ -15,7 +15,7 @@
       "fields": [
         { "fieldPath": "hostelId", "order": "ASCENDING" },
         { "fieldPath": "isActive", "order": "ASCENDING" },
-        { "fieldPath": "name", "order": "ASCENDING" }
+        { "fieldPath": "roomNumber", "order": "ASCENDING" }
       ]
     },
     {
@@ -24,6 +24,14 @@
       "fields": [
         { "fieldPath": "hostelId", "order": "ASCENDING" },
         { "fieldPath": "isActive", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "rooms",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "isActive", "order": "ASCENDING" },
+        { "fieldPath": "roomNumber", "order": "ASCENDING" }
       ]
     },
     {
