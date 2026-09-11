@@ -22,20 +22,23 @@ service cloud.firestore {
     }
 
     // ---- Hostels ----
+    // Public catalog: students must see hostels before signing in.
     match /hostels/{hostelId} {
-      allow read: if resource.data.active == true;
+      allow read: if true;
       allow write: if isAdmin();
     }
 
     // ---- Rooms ----
+    // Public catalog: availability/room info shown to all guests.
     match /rooms/{roomId} {
-      allow read: if resource.data.active == true;
+      allow read: if true;
       allow write: if isAdmin();
     }
 
     // ---- Beds ----
+    // Public catalog: bed availability shown to all guests.
     match /beds/{bedId} {
-      allow read: if resource.data.active == true;
+      allow read: if true;
       allow write: if isAdmin();
     }
 
@@ -47,7 +50,7 @@ service cloud.firestore {
     }
 
     // ---- Bookings ----
-    // Public users can only look up via booking reference (no writes).
+    // Public users can look up only with a valid booking reference.
     match /bookings/{bookingId} {
       allow read: if isAdmin()
         || (isAuthenticated() && resource.data.bookingReference != null);
