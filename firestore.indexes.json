@@ -104,13 +104,6 @@
       "collectionGroup": "bookings",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "bookingReference", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "bookings",
-      "queryScope": "COLLECTION",
-      "fields": [
         { "fieldPath": "roomId", "order": "ASCENDING" },
         { "fieldPath": "status", "order": "ASCENDING" }
       ]
@@ -121,13 +114,6 @@
       "fields": [
         { "fieldPath": "bookingId", "order": "ASCENDING" },
         { "fieldPath": "status", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "payments",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "studentId", "order": "ASCENDING" }
       ]
     }
   ],
