@@ -1,0 +1,94 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Authentication helpers
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.admin == true;
+    }
+
+    function isSuperAdmin() {
+      return request.auth != null
+        && request.auth.token.super_admin == true;
+    }
+
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    // ---- Hostels ----
+    match /hostels/{hostelId} {
+      allow read: if resource.data.active == true;
+      allow write: if isAdmin();
+    }
+
+    // ---- Rooms ----
+    match /rooms/{roomId} {
+      allow read: if resource.data.active == true;
+      allow write: if isAdmin();
+    }
+
+    // ---- Beds ----
+    match /beds/{bedId} {
+      allow read: if resource.data.active == true;
+      allow write: if isAdmin();
+    }
+
+    // ---- Students ----
+    // Writes happen via trusted Cloud Functions (Admin SDK bypasses rules).
+    match /students/{studentId} {
+      allow read: if isAdmin() || isOwner(studentId);
+      allow write: if false;
+    }
+
+    // ---- Bookings ----
+    // Public users can only look up via booking reference (no writes).
+    match /bookings/{bookingId} {
+      allow read: if isAdmin()
+        || (isAuthenticated() && resource.data.bookingReference != null);
+      allow write: if false;
+    }
+
+    // ---- Payments ----
+    match /payments/{paymentId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    // ---- Semesters ----
+    match /semesters/{semesterId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ---- Accommodation Types ----
+    match /accommodationTypes/{typeId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ---- Admins ----
+    match /admins/{adminId} {
+      allow read: if isAdmin();
+      allow write: if isSuperAdmin();
+    }
+
+    // ---- Settings ----
+    match /settings/{settingId} {
+      allow read: if isAdmin();
+      allow write: if isSuperAdmin();
+    }
+
+    // ---- Audit Logs ----
+    // Written by Cloud Functions only; readable by admins.
+    match /auditLogs/{logId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+  }
+}

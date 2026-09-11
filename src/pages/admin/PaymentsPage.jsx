@@ -1,0 +1,470 @@
+import { useEffect, useState, useMemo, useCallback } from 'react';
+import toast from 'react-hot-toast';
+import {
+  Download,
+  FileSpreadsheet,
+  Eye,
+  Wallet,
+  CheckCircle2,
+  Clock,
+  XCircle,
+} from 'lucide-react';
+import * as XLSX from 'xlsx';
+import Papa from 'papaparse';
+
+import DataTable from '../../components/admin/DataTable';
+import Modal from '../../components/admin/Modal';
+import FilterBar from '../../components/admin/FilterBar';
+import StatusBadge from '../../components/admin/StatusBadge';
+import StatCard from '../../components/admin/StatCard';
+import { getPayments } from '../../services/paymentService';
+import { getAllSemesters } from '../../services/semesterService';
+
+function fmtDate(value) {
+  if (!value) return '—';
+  if (typeof value === 'object' && typeof value.toDate === 'function')
+    return value.toDate().toLocaleDateString();
+  const d = new Date(value);
+  return isNaN(d.getTime()) ? String(value) : d.toLocaleDateString();
+}
+
+function fmtDateTime(value) {
+  if (!value) return '—';
+  if (typeof value === 'object' && typeof value.toDate === 'function')
+    return value.toDate().toLocaleString();
+  const d = new Date(value);
+  return isNaN(d.getTime()) ? String(value) : d.toLocaleString();
+}
+
+function fmtMoney(n) {
+  return 'KSh ' + Number(n || 0).toLocaleString();
+}
+
+function dateValue(value) {
+  if (!value) return null;
+  if (typeof value === 'object' && typeof value.toDate === 'function') {
+    const d = value.toDate();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(
+      d.getDate()
+    ).padStart(2, '0')}`;
+  }
+  return value;
+}
+
+function downloadBlob(content, filename, mime) {
+  const blob = content instanceof Blob ? content : new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function toExportRows(rows) {
+  return rows.map((p) => ({
+    Student: p.studentName || '',
+    'Booking Ref': p.bookingReference || p.bookingId || '',
+    Room: p.roomName || p.roomNumber || '',
+    Bed: p.bedName || (p.bedNumber ? `Bed ${p.bedNumber}` : ''),
+    Accommodation: p.accommodationType || '',
+    Amount: p.amount || 0,
+    Phone: p.phone || p.studentPhone || '',
+    Receipt: p.receiptNumber || p.mpesaReceipt || p.reference || '',
+    Status: p.status || '',
+    Date: fmtDate(p.createdAt),
+  }));
+}
+
+export default function PaymentsPage() {
+  const [semesters, setSemesters] = useState([]);
+  const [semesterId, setSemesterId] = useState('');
+  const [payments, setPayments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const [search, setSearch] = useState('');
+  const [filters, setFilters] = useState({ status: '', dateFrom: '', dateTo: '' });
+  const [detail, setDetail] = useState(null);
+
+  const loadData = useCallback(async (sid) => {
+    if (!sid) return;
+    setLoading(true);
+    setError(null);
+    try {
+      setPayments(await getPayments({ semesterId: sid }));
+    } catch (err) {
+      console.error('Failed to load payments:', err);
+      setError('Failed to load payments. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const list = await getAllSemesters();
+        if (cancelled) return;
+        setSemesters(list);
+        const active = list.find((s) => s.isActive && !s.isClosed) || list[0];
+        setSemesterId(active ? active.id : '');
+      } catch (err) {
+        console.error('Failed to load semesters:', err);
+        if (!cancelled) {
+          setError('Failed to load payments. Please try again.');
+          setLoading(false);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (semesterId) loadData(semesterId);
+  }, [semesterId, loadData]);
+
+  const filtered = useMemo(() => {
+    const q = search.toLowerCase();
+    return payments.filter((p) => {
+      const receipt = `${p.receiptNumber || ''} ${p.mpesaReceipt || ''} ${p.reference || ''}`.toLowerCase();
+      const matchesSearch =
+        !q ||
+        (p.studentName || '').toLowerCase().includes(q) ||
+        receipt.includes(q);
+      const matchesStatus = !filters.status || p.status === filters.status;
+      let matchesRange = true;
+      if (filters.dateFrom || filters.dateTo) {
+        const d = dateValue(p.createdAt);
+        if (d) {
+          if (filters.dateFrom && d < filters.dateFrom) matchesRange = false;
+          if (filters.dateTo && d > filters.dateTo) matchesRange = false;
+        }
+      }
+      return matchesSearch && matchesStatus && matchesRange;
+    });
+  }, [payments, search, filters]);
+
+  function handleChange(key, value) {
+    setFilters((f) => ({ ...f, [key]: value }));
+  }
+
+  const summary = useMemo(() => {
+    const revenue = payments
+      .filter((p) => p.status === 'completed')
+      .reduce((sum, p) => sum + Number(p.amount || 0), 0);
+    const paid = payments
+      .filter((p) => p.status === 'completed')
+      .reduce((sum, p) => sum + Number(p.amount || 0), 0);
+    const paidCount = payments.filter((p) => p.status === 'completed').length;
+    const pending = payments.filter((p) => p.status === 'pending');
+    const pendingCount = pending.length;
+    const pendingAmount = pending.reduce((s, p) => s + Number(p.amount || 0), 0);
+    const failed = payments.filter((p) => p.status === 'failed');
+    const failedCount = failed.length;
+    const failedAmount = failed.reduce((s, p) => s + Number(p.amount || 0), 0);
+    return { revenue, paid, paidCount, pendingCount, pendingAmount, failedCount, failedAmount };
+  }, [payments]);
+
+  function exportCSV() {
+    if (filtered.length === 0) {
+      toast.error('Nothing to export');
+      return;
+    }
+    const csv = Papa.unparse(toExportRows(filtered));
+    downloadBlob(csv, `payments-${new Date().toISOString().split('T')[0]}.csv`, 'text/csv;charset=utf-8;');
+    toast.success('CSV exported');
+  }
+
+  function exportExcel() {
+    if (filtered.length === 0) {
+      toast.error('Nothing to export');
+      return;
+    }
+    const ws = XLSX.utils.json_to_sheet(toExportRows(filtered));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Payments');
+    XLSX.writeFile(wb, `payments-${new Date().toISOString().split('T')[0]}.xlsx`);
+    toast.success('Excel file exported');
+  }
+
+  const columns = [
+    {
+      key: 'studentName',
+      label: 'Student',
+      render: (p) => (
+        <div>
+          <div className="font-medium text-gray-900">{p.studentName || '—'}</div>
+          <div className="text-xs text-gray-400">{p.studentPhone || ''}</div>
+        </div>
+      ),
+    },
+    {
+      key: 'bookingRef',
+      label: 'Booking Ref',
+      render: (p) => (
+        <span className="font-medium text-indigo-600">
+          {p.bookingReference || p.bookingRef || '—'}
+        </span>
+      ),
+    },
+    { key: 'room', label: 'Room', render: (p) => p.roomName || p.roomNumber || '—' },
+    { key: 'bed', label: 'Bed', render: (p) => p.bedName || (p.bedNumber ? `Bed ${p.bedNumber}` : '—') },
+    {
+      key: 'accommodationType',
+      label: 'Accommodation',
+      render: (p) => p.accommodationType || '—',
+    },
+    {
+      key: 'amount',
+      label: 'Amount',
+      sortable: true,
+      render: (p) => <span className="font-medium text-gray-900">{fmtMoney(p.amount)}</span>,
+    },
+    {
+      key: 'phone',
+      label: 'Phone',
+      render: (p) => p.phone || p.studentPhone || '—',
+    },
+    {
+      key: 'receipt',
+      label: 'M-Pesa Receipt',
+      render: (p) => (
+        <span className="text-gray-700">
+          {p.receiptNumber || p.mpesaReceipt || p.reference || '—'}
+        </span>
+      ),
+    },
+    {
+      key: 'createdAt',
+      label: 'Date',
+      sortable: true,
+      render: (p) => <span className="text-gray-500">{fmtDate(p.createdAt)}</span>,
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      sortable: true,
+      render: (p) => <StatusBadge status={p.status} type="payment" />,
+    },
+    {
+      key: 'actions',
+      label: 'Actions',
+      sortable: false,
+      render: (p) => (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setDetail(p);
+          }}
+          className="p-1.5 rounded-lg text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
+          title="View details"
+        >
+          <Eye className="w-4 h-4" />
+        </button>
+      ),
+    },
+  ];
+
+  const filterConfigs = [
+    {
+      key: 'status',
+      label: 'Status',
+      options: [
+        { value: 'completed', label: 'Completed' },
+        { value: 'pending', label: 'Pending' },
+        { value: 'failed', label: 'Failed' },
+        { value: 'verified', label: 'Verified' },
+        { value: 'refunded', label: 'Refunded' },
+      ],
+    },
+  ];
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h2 className="text-xl font-bold text-gray-900">Payments</h2>
+          <p className="text-sm text-gray-500">{payments.length} payments</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <label className="flex items-center gap-2 text-sm text-gray-600">
+            <span className="font-medium whitespace-nowrap">Semester:</span>
+            <select
+              value={semesterId}
+              onChange={(e) => setSemesterId(e.target.value)}
+              className="py-2 pl-3 pr-8 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white"
+            >
+              {semesters.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button
+            onClick={exportCSV}
+            className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <Download className="w-4 h-4" />
+            CSV
+          </button>
+          <button
+            onClick={exportExcel}
+            className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-green-700 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors"
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            Excel
+          </button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          title="Total Revenue"
+          value={fmtMoney(summary.revenue)}
+          icon={Wallet}
+          color="green"
+          subtitle={`${summary.paidCount} completed payments`}
+        />
+        <StatCard
+          title="Paid"
+          value={fmtMoney(summary.paid)}
+          icon={CheckCircle2}
+          color="blue"
+          subtitle={`${summary.paidCount} payments`}
+        />
+        <StatCard
+          title="Pending"
+          value={summary.pendingCount}
+          icon={Clock}
+          color="yellow"
+          subtitle={fmtMoney(summary.pendingAmount)}
+        />
+        <StatCard
+          title="Failed"
+          value={summary.failedCount}
+          icon={XCircle}
+          color="red"
+          subtitle={fmtMoney(summary.failedAmount)}
+        />
+      </div>
+
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex flex-wrap items-end gap-3">
+        <div>
+          <label className="block text-xs font-medium text-gray-500 mb-1">
+            Date From
+          </label>
+          <input
+            type="date"
+            value={filters.dateFrom}
+            onChange={(e) => handleChange('dateFrom', e.target.value)}
+            className="py-2 px-3 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white"
+          />
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-gray-500 mb-1">
+            Date To
+          </label>
+          <input
+            type="date"
+            value={filters.dateTo}
+            onChange={(e) => handleChange('dateTo', e.target.value)}
+            className="py-2 px-3 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white"
+          />
+        </div>
+        <FilterBar
+          filters={filterConfigs}
+          values={filters}
+          onChange={handleChange}
+          searchValue={search}
+          onSearchChange={setSearch}
+          searchPlaceholder="Search by receipt or student..."
+        />
+      </div>
+
+      {error ? (
+        <div className="bg-white rounded-xl border border-red-200 p-10 text-center">
+          <p className="text-red-600 font-medium">{error}</p>
+          <button
+            onClick={() => loadData(semesterId)}
+            className="mt-4 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      ) : (
+        <DataTable
+          columns={columns}
+          data={filtered}
+          loading={loading}
+          emptyMessage="No payments found"
+          onRowClick={(p) => setDetail(p)}
+          pageSize={10}
+        />
+      )}
+
+      <Modal
+        isOpen={!!detail}
+        onClose={() => setDetail(null)}
+        title="Payment Details"
+        size="lg"
+        footer={
+          <div className="flex justify-end">
+            <button
+              onClick={() => setDetail(null)}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        }
+      >
+        {detail && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {[
+                ['Student', detail.studentName],
+                ['Phone', detail.phone || detail.studentPhone],
+                ['Booking Ref', detail.bookingReference || detail.bookingId],
+                ['Room', detail.roomName || detail.roomNumber],
+                ['Bed', detail.bedName || (detail.bedNumber ? `Bed ${detail.bedNumber}` : '')],
+                ['Accommodation', detail.accommodationType],
+                ['Amount', fmtMoney(detail.amount)],
+                ['M-Pesa Receipt', detail.receiptNumber || detail.mpesaReceipt || detail.reference],
+                ['Method', detail.paymentMethod],
+                ['Status', detail.status],
+                ['Date', fmtDateTime(detail.createdAt)],
+                ['Payment ID', detail.id],
+              ].map(([k, v]) => (
+                <div key={k} className="bg-gray-50 rounded-lg p-3">
+                  <div className="text-xs text-gray-500">{k}</div>
+                  {k === 'Status' ? (
+                    <StatusBadge status={v} type="payment" />
+                  ) : (
+                    <div className="text-sm font-medium text-gray-900 break-all">
+                      {v || '—'}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+            {detail.transactionId && (
+              <div className="bg-gray-50 rounded-lg p-3 text-sm">
+                <span className="text-gray-500">Transaction ID: </span>
+                <span className="font-medium text-gray-900">
+                  {detail.transactionId}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+      </Modal>
+    </div>
+  );
+}
