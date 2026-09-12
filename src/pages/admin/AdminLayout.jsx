@@ -84,7 +84,7 @@ export default function AdminLayout() {
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-72 bg-clay-950 text-white transform transition-transform duration-200 lg:translate-x-0 lg:static lg:inset-y-auto lg:h-screen ${
+        className={`fixed inset-y-0 left-0 z-40 w-72 bg-clay-950 text-white transform transition-transform duration-200 lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
