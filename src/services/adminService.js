@@ -1,6 +1,7 @@
 import {
   collection,
   doc,
+  setDoc,
   getDocs,
   getDoc,
   updateDoc,
@@ -8,29 +9,56 @@ import {
   orderBy,
   serverTimestamp,
 } from 'firebase/firestore';
-import { getFunctions, httpsCallable } from 'firebase/functions';
-import { app, firebaseReady } from '../firebase/config';
+import { app, db, firebaseReady } from '../firebase/config';
 
 const COLLECTION = 'admins';
-
-function getFunctionsInstance() {
-  if (!firebaseReady || !app) {
-    throw new Error('Firebase is not configured. Please set up your Firebase credentials.');
-  }
-  return getFunctions(app);
-}
 
 function serialize(docSnap) {
   return { id: docSnap.id, ...docSnap.data() };
 }
 
+function assertReady() {
+  if (!firebaseReady || !app || !db) {
+    throw new Error('Firebase is not configured. Please set up your Firebase credentials.');
+  }
+}
+
+async function createAuthUser(email, password) {
+  const apiKey = app.options.apiKey;
+  const res = await fetch(
+    `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${apiKey}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email,
+        password,
+        returnSecureToken: false,
+      }),
+    }
+  );
+  if (!res.ok) {
+    let message = `Failed to create user (HTTP ${res.status})`;
+    try {
+      const err = await res.json();
+      if (err.error?.message) message = err.error.message;
+    } catch {
+      // keep default message
+    }
+    throw new Error(message);
+  }
+  return res.json();
+}
+
 export async function getAdmins() {
+  assertReady();
   const q = query(collection(db, COLLECTION), orderBy('displayName', 'asc'));
   const snapshot = await getDocs(q);
   return snapshot.docs.map(serialize);
 }
 
 export async function getAdmin(uid) {
+  assertReady();
   const docRef = doc(db, COLLECTION, uid);
   const docSnap = await getDoc(docRef);
   if (!docSnap.exists()) {
@@ -40,13 +68,26 @@ export async function getAdmin(uid) {
 }
 
 export async function createAdmin(data) {
-  const functions = getFunctionsInstance();
-  const createAdminFn = httpsCallable(functions, 'createAdmin');
-  const result = await createAdminFn(data);
-  return result.data;
+  assertReady();
+  const user = await createAuthUser(data.email, data.password);
+  const uid = user.localId;
+
+  const docRef = doc(db, COLLECTION, uid);
+  await setDoc(docRef, {
+    uid,
+    email: data.email,
+    displayName: data.displayName || data.name || data.email,
+    role: data.role || 'ADMIN',
+    active: data.active !== undefined ? data.active : true,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+
+  return { uid, email: data.email, displayName: data.displayName, role: data.role };
 }
 
 export async function updateAdmin(uid, data) {
+  assertReady();
   const docRef = doc(db, COLLECTION, uid);
   await updateDoc(docRef, {
     ...data,
@@ -57,8 +98,11 @@ export async function updateAdmin(uid, data) {
 }
 
 export async function setAdminRole(uid, role) {
-  const functions = getFunctionsInstance();
-  const setAdminRoleFn = httpsCallable(functions, 'setAdminRole');
-  const result = await setAdminRoleFn({ uid, role });
-  return result.data;
+  assertReady();
+  const docRef = doc(db, COLLECTION, uid);
+  await updateDoc(docRef, {
+    role,
+    updatedAt: serverTimestamp(),
+  });
+  return { uid, role };
 }

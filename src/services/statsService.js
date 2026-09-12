@@ -5,13 +5,14 @@ import {
   where,
 } from 'firebase/firestore';
 import { db } from '../firebase/config';
+import { isPaymentPaid } from '../utils/status';
 
 function serialize(docSnap) {
   return { id: docSnap.id, ...docSnap.data() };
 }
 
 export async function getDashboardStats(semesterId) {
-  const [roomsSnapshot, bedsSnapshot, bookingsSnapshot, paymentsSnapshot] =
+  const [roomsSnapshot, bedsSnapshot, bookingsSnapshot] =
     await Promise.all([
       getDocs(
         query(collection(db, 'rooms'), where('isActive', '==', true))
@@ -25,35 +26,29 @@ export async function getDashboardStats(semesterId) {
           where('semesterId', '==', semesterId)
         )
       ),
-      getDocs(
-        query(
-          collection(db, 'payments'),
-          where('semesterId', '==', semesterId),
-          where('status', '==', 'completed')
-        )
-      ),
     ]);
 
   const rooms = roomsSnapshot.docs.map((d) => d.data());
   const beds = bedsSnapshot.docs.map((d) => d.data());
   const bookings = bookingsSnapshot.docs.map((d) => d.data());
-  const payments = paymentsSnapshot.docs.map((d) => d.data());
 
   const totalRooms = rooms.length;
   const totalBeds = beds.length;
-  const availableBeds = beds.filter((b) => b.status === 'available').length;
-  const occupiedBeds = beds.filter((b) => b.status === 'occupied').length;
-  const blockedBeds = beds.filter((b) => b.status === 'blocked').length;
+  const availableBeds = beds.filter((b) => b.status === 'AVAILABLE').length;
+  const occupiedBeds = beds.filter((b) => b.status === 'BOOKED').length;
+  const blockedBeds = beds.filter((b) => b.status === 'BLOCKED').length;
 
   const totalBookings = bookings.length;
   const confirmedBookings = bookings.filter(
-    (b) => b.status === 'confirmed'
+    (b) => b.bookingStatus === 'CONFIRMED'
   ).length;
   const pendingBookings = bookings.filter(
-    (b) => b.status === 'pending'
+    (b) => b.bookingStatus === 'PENDING_PAYMENT'
   ).length;
 
-  const totalRevenue = payments.reduce((sum, p) => sum + (p.amount || 0), 0);
+  const totalRevenue = bookings
+    .filter((b) => isPaymentPaid(b.paymentStatus))
+    .reduce((sum, b) => sum + Number(b.price || b.amount || 0), 0);
 
   const occupancyRate =
     totalBeds > 0 ? ((occupiedBeds / totalBeds) * 100).toFixed(1) : 0;
@@ -72,7 +67,7 @@ export async function getDashboardStats(semesterId) {
   };
 }
 
-export async function getOccupancyStats(semesterId) {
+export async function getOccupancyStats() {
   const [bedsSnapshot, roomsSnapshot] = await Promise.all([
     getDocs(query(collection(db, 'beds'), where('isActive', '==', true))),
     getDocs(query(collection(db, 'rooms'), where('isActive', '==', true))),
@@ -98,13 +93,13 @@ export async function getOccupancyStats(semesterId) {
     const roomBeds = beds.filter((b) => b.roomId === room.id);
     hostelStats[room.hostelId].totalBeds += roomBeds.length;
     hostelStats[room.hostelId].availableBeds += roomBeds.filter(
-      (b) => b.status === 'available'
+      (b) => b.status === 'AVAILABLE'
     ).length;
     hostelStats[room.hostelId].occupiedBeds += roomBeds.filter(
-      (b) => b.status === 'occupied'
+      (b) => b.status === 'BOOKED'
     ).length;
     hostelStats[room.hostelId].blockedBeds += roomBeds.filter(
-      (b) => b.status === 'blocked'
+      (b) => b.status === 'BLOCKED'
     ).length;
   }
 
@@ -117,14 +112,14 @@ export async function getOccupancyStats(semesterId) {
   }));
 
   const totalBeds = beds.length;
-  const occupiedBeds = beds.filter((b) => b.status === 'occupied').length;
+  const occupiedBeds = beds.filter((b) => b.status === 'BOOKED').length;
 
   return {
     overall: {
       totalBeds,
       occupiedBeds,
-      availableBeds: beds.filter((b) => b.status === 'available').length,
-      blockedBeds: beds.filter((b) => b.status === 'blocked').length,
+      availableBeds: beds.filter((b) => b.status === 'AVAILABLE').length,
+      blockedBeds: beds.filter((b) => b.status === 'BLOCKED').length,
       occupancyRate:
         totalBeds > 0
           ? Number(((occupiedBeds / totalBeds) * 100).toFixed(1))
@@ -134,13 +129,9 @@ export async function getOccupancyStats(semesterId) {
   };
 }
 
-export async function getRevenueStats(semesterId) {
+export async function getRevenueStats() {
   const paymentsSnapshot = await getDocs(
-    query(
-      collection(db, 'payments'),
-      where('semesterId', '==', semesterId),
-      where('status', '==', 'completed')
-    )
+    query(collection(db, 'payments'), where('status', '==', 'PAID'))
   );
 
   const payments = paymentsSnapshot.docs.map((d) => d.data());
@@ -149,7 +140,7 @@ export async function getRevenueStats(semesterId) {
   const totalCount = payments.length;
 
   const methodBreakdown = payments.reduce((acc, p) => {
-    const method = p.paymentMethod || 'unknown';
+    const method = p.method || p.paymentMethod || 'unknown';
     acc[method] = (acc[method] || 0) + (p.amount || 0);
     return acc;
   }, {});

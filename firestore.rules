@@ -9,12 +9,21 @@ service cloud.firestore {
 
     function isAdmin() {
       return request.auth != null
-        && request.auth.token.admin == true;
+        && (
+          request.auth.token.admin == true
+          || exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+        );
     }
 
     function isSuperAdmin() {
       return request.auth != null
-        && request.auth.token.super_admin == true;
+        && (
+          request.auth.token.super_admin == true
+          || (
+            exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+            && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == 'SUPER_ADMIN'
+          )
+        );
     }
 
     function isOwner(userId) {
@@ -37,30 +46,44 @@ service cloud.firestore {
 
     // ---- Beds ----
     // Public catalog: bed availability shown to all guests.
+    // Students may only flip an available bed to 'pending' when booking;
+    // all other writes are admin-only.
     match /beds/{bedId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow create: if isAdmin();
+      allow update: if isAdmin()
+        || (isAuthenticated() && request.resource.data.status in ['available', 'pending']);
+      allow delete: if isAdmin();
     }
 
     // ---- Students ----
     // Writes happen via trusted Cloud Functions (Admin SDK bypasses rules).
+    // Fallback: any signed-in user can create their own record; admins manage them.
     match /students/{studentId} {
       allow read: if isAdmin() || isOwner(studentId);
-      allow write: if false;
+      allow create: if isAuthenticated();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
     }
 
     // ---- Bookings ----
     // Public users can look up only with a valid booking reference.
+    // Fallback: signed-in users can create pending bookings; admins manage them.
     match /bookings/{bookingId} {
       allow read: if isAdmin()
         || (isAuthenticated() && resource.data.bookingReference != null);
-      allow write: if false;
+      allow create: if isAuthenticated();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
     }
 
     // ---- Payments ----
+    // Fallback: signed-in users create the payment record; admins confirm it.
     match /payments/{paymentId} {
       allow read: if isAdmin();
-      allow write: if false;
+      allow create: if isAuthenticated();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
     }
 
     // ---- Semesters ----
@@ -78,7 +101,7 @@ service cloud.firestore {
     // ---- Admins ----
     match /admins/{adminId} {
       allow read: if isAdmin();
-      allow write: if isSuperAdmin();
+      allow write: if isAdmin() && isSuperAdmin();
     }
 
     // ---- Settings ----
@@ -91,7 +114,7 @@ service cloud.firestore {
     // Written by Cloud Functions only; readable by admins.
     match /auditLogs/{logId} {
       allow read: if isAdmin();
-      allow write: if false;
+      allow write: if isAdmin();
     }
   }
 }

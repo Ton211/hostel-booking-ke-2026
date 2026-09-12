@@ -42,6 +42,7 @@ export async function createSemester(data) {
     ...data,
     isActive: true,
     isClosed: false,
+    bookingOpen: data.bookingOpen ?? false,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });

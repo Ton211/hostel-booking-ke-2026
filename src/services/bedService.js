@@ -43,7 +43,7 @@ export async function getAvailableBeds(roomId, semesterId) {
     collection(db, COLLECTION),
     where('roomId', '==', roomId),
     where('isActive', '==', true),
-    where('status', '==', 'AVAILABLE')
+    where('status', '==', 'available')
   );
   const snapshot = await getDocs(q);
   return snapshot.docs.map(serialize);
@@ -62,7 +62,7 @@ export async function updateBedStatus(bedId, status) {
 export async function createBed(data) {
   const docRef = await addDoc(collection(db, COLLECTION), {
     ...data,
-    status: data.status || 'AVAILABLE',
+    status: data.status ? String(data.status).toLowerCase() : 'available',
     isActive: true,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
@@ -84,7 +84,7 @@ export async function updateBed(bedId, data) {
 export async function blockBed(bedId) {
   const docRef = doc(db, COLLECTION, bedId);
   await updateDoc(docRef, {
-    status: 'BLOCKED',
+    status: 'blocked',
     blockedAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });
@@ -95,7 +95,7 @@ export async function blockBed(bedId) {
 export async function unblockBed(bedId) {
   const docRef = doc(db, COLLECTION, bedId);
   await updateDoc(docRef, {
-    status: 'AVAILABLE',
+    status: 'available',
     blockedAt: null,
     updatedAt: serverTimestamp(),
   });

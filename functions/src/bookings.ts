@@ -44,7 +44,6 @@ export const createBooking = functions.https.onCall(async (data: CreateBookingDa
   const semesterQuery = await db
     .collection("semesters")
     .where("isActive", "==", true)
-    .where("bookingOpen", "==", true)
     .limit(1)
     .get();
 
@@ -54,7 +53,29 @@ export const createBooking = functions.https.onCall(async (data: CreateBookingDa
 
   const semester = semesterQuery.docs[0].data();
   const now = new Date();
-  const bookingDeadline = semester.bookingDeadline?.toDate();
+
+  const bookingOpenRaw = semester.bookingOpen ?? semester.bookingStart ?? semester.bookingStartDate;
+  let bookingOpenFlag = semester.status === "OPEN";
+  if (typeof bookingOpenRaw === "boolean") {
+    bookingOpenFlag = bookingOpenRaw;
+  } else if (bookingOpenRaw && typeof bookingOpenRaw.toDate === "function") {
+    bookingOpenFlag = bookingOpenRaw.toDate() <= now;
+  } else if (bookingOpenRaw && typeof bookingOpenRaw === "string") {
+    bookingOpenFlag = new Date(bookingOpenRaw) <= now;
+  }
+  if (semester.isClosed) bookingOpenFlag = false;
+
+  if (!bookingOpenFlag) {
+    throw new functions.https.HttpsError("failed-precondition", "Booking is not open for the active semester");
+  }
+
+  const deadlineRaw = semester.bookingDeadline ?? semester.bookingEnd ?? semester.bookingEndDate;
+  const bookingDeadline =
+    deadlineRaw && typeof deadlineRaw.toDate === "function"
+      ? deadlineRaw.toDate()
+      : deadlineRaw && typeof deadlineRaw === "string"
+      ? new Date(deadlineRaw)
+      : null;
   if (bookingDeadline && now > bookingDeadline) {
     throw new functions.https.HttpsError("failed-precondition", "Booking period has ended");
   }

@@ -57,7 +57,7 @@ export async function getRevenueStats(semesterId) {
   const q = query(
     collection(db, COLLECTION),
     where('semesterId', '==', semesterId),
-    where('status', '==', 'completed')
+    where('status', '==', 'PAID')
   );
   const snapshot = await getDocs(q);
   const payments = snapshot.docs.map((d) => d.data());

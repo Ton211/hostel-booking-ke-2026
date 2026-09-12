@@ -34,7 +34,7 @@ export async function getRoomsByHostel(hostelId) {
 export async function getRoomsByGender(gender) {
   const q = query(
     collection(db, COLLECTION),
-    where('gender', '==', gender),
+    where('gender', '==', String(gender).toLowerCase()),
     where('isActive', '==', true),
     orderBy('roomNumber', 'asc')
   );
