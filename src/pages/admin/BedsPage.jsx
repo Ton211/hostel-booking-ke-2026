@@ -31,13 +31,14 @@ async function fetchRoomsAndBeds() {
   const bookingMap = {};
   bookingsSnap.docs.forEach((d) => {
     const b = d.data();
-    if (['confirmed', 'active', 'pending'].includes(b.status)) {
+    const bookingStatus = b.bookingStatus || b.status;
+    if (['CONFIRMED', 'PENDING_PAYMENT', 'confirmed', 'active', 'pending'].includes(bookingStatus)) {
       if (b.bedId && !bookingMap[b.bedId]) {
         bookingMap[b.bedId] = {
           studentName: b.studentName || b.student?.name || 'N/A',
-          reference: b.reference,
+          reference: b.bookingReference || b.reference,
           bookingId: d.id,
-          status: b.status,
+          status: bookingStatus,
         };
       }
     }
