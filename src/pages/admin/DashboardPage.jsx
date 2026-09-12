@@ -25,14 +25,19 @@ import {
   Landmark,
   RefreshCw,
 } from 'lucide-react';
+import { collection, query, where, orderBy } from 'firebase/firestore';
 
+import { db } from '../../firebase/config';
 import StatCard from '../../components/admin/StatCard';
-import { getAllSemesters } from '../../services/semesterService';
-import { getDashboardStats } from '../../services/statsService';
-import { getRoomsWithAvailability } from '../../services/roomService';
-import { getBookingsBySemester } from '../../services/bookingService';
-import { getPayments } from '../../services/paymentService';
-import { getAllHostels } from '../../services/hostelService';
+import { useRealtimeQuery } from '../../hooks/useRealtime';
+import {
+  isBedAvailable,
+  isBedOccupied,
+  isBedBlocked,
+  isBookingConfirmed,
+  isBookingPending,
+  isPaymentPaid,
+} from '../../utils/status';
 
 function fmtMoney(value) {
   return 'KSh ' + Number(value || 0).toLocaleString();
@@ -41,58 +46,149 @@ function fmtMoney(value) {
 const PIE_COLORS = ['#10b981', '#ef4444', '#f59e0b', '#9ca3af'];
 
 export default function DashboardPage() {
-  const [semesters, setSemesters] = useState([]);
   const [semesterId, setSemesterId] = useState('');
-  const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const loadData = useCallback(async (sid) => {
-    if (!sid) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const [stats, rooms, bookings, payments, hostels] = await Promise.all([
-        getDashboardStats(sid),
-        getRoomsWithAvailability(sid),
-        getBookingsBySemester(sid),
-        getPayments({ semesterId: sid }),
-        getAllHostels(),
-      ]);
-      setData({ stats, rooms, bookings, payments, hostels });
-    } catch (err) {
-      console.error('Failed to load dashboard:', err);
-      setError('Failed to load dashboard statistics. Please try again.');
-    } finally {
-      setLoading(false);
+  const semesterRows = useRealtimeQuery(
+    () => query(collection(db, 'semesters'), orderBy('startDate', 'desc')),
+    []
+  );
+  const roomRows = useRealtimeQuery(
+    () => query(collection(db, 'rooms'), where('isActive', '==', true)),
+    []
+  );
+  const bedRows = useRealtimeQuery(
+    () => query(collection(db, 'beds'), where('isActive', '==', true)),
+    []
+  );
+  const bookingRows = useRealtimeQuery(
+    () =>
+      semesterId
+        ? query(collection(db, 'bookings'), where('semesterId', '==', semesterId))
+        : null,
+    [semesterId]
+  );
+  const paymentRows = useRealtimeQuery(
+    () =>
+      semesterId
+        ? query(
+            collection(db, 'payments'),
+            where('semesterId', '==', semesterId),
+            orderBy('createdAt', 'desc')
+          )
+        : null,
+    [semesterId]
+  );
+
+  useEffect(() => {
+    if (!semesterId && semesterRows.data.length) {
+      const active =
+        semesterRows.data.find((s) => s.isActive && !s.isClosed) ||
+        semesterRows.data[0];
+      setSemesterId(active ? active.id : '');
     }
-  }, []);
+  }, [semesterId, semesterRows.data]);
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const list = await getAllSemesters();
-        if (cancelled) return;
-        setSemesters(list);
-        const active = list.find((s) => s.isActive && !s.isClosed) || list[0];
-        setSemesterId(active ? active.id : '');
-      } catch (err) {
-        console.error('Failed to load semesters:', err);
-        if (!cancelled) {
-          setError('Failed to load dashboard statistics. Please try again.');
-          setLoading(false);
-        }
-      }
-    })();
-    return () => {
-      cancelled = true;
+  const semesters = semesterRows.data;
+  const bookings = bookingRows.data;
+  const payments = paymentRows.data;
+
+  const stats = useMemo(() => {
+    const activeRooms = roomRows.data;
+    const activeBeds = bedRows.data;
+    const semesterBookings = bookingRows.data;
+
+    const totalRooms = activeRooms.length;
+    const totalBeds = activeBeds.length;
+    const availableBeds = activeBeds.filter((b) => isBedAvailable(b.status)).length;
+    const occupiedBeds = activeBeds.filter((b) => isBedOccupied(b.status)).length;
+    const blockedBeds = activeBeds.filter((b) => isBedBlocked(b.status)).length;
+
+    const totalBookings = semesterBookings.length;
+    const confirmedBookings = semesterBookings.filter((b) =>
+      isBookingConfirmed(b.bookingStatus || b.status)
+    ).length;
+    const pendingBookings = semesterBookings.filter((b) =>
+      isBookingPending(b.bookingStatus || b.status)
+    ).length;
+
+    const totalRevenue = semesterBookings
+      .filter((b) => isPaymentPaid(b.paymentStatus))
+      .reduce((sum, b) => sum + Number(b.price || b.amount || 0), 0);
+
+    const occupancyRate =
+      totalBeds > 0 ? Number(((occupiedBeds / totalBeds) * 100).toFixed(1)) : 0;
+
+    return {
+      totalRooms,
+      totalBeds,
+      availableBeds,
+      occupiedBeds,
+      blockedBeds,
+      occupancyRate,
+      totalBookings,
+      confirmedBookings,
+      pendingBookings,
+      totalRevenue,
     };
-  }, []);
+  }, [roomRows.data, bedRows.data, bookingRows.data]);
+
+  const rooms = useMemo(() => {
+    return roomRows.data.map((room) => {
+      const roomBeds = bedRows.data.filter((b) => b.roomId === room.id);
+      const totalBeds = roomBeds.length;
+      const availableBeds = roomBeds.filter((b) => isBedAvailable(b.status)).length;
+      const blockedBeds = roomBeds.filter((b) => isBedBlocked(b.status)).length;
+      const occupiedBeds = totalBeds - availableBeds - blockedBeds;
+      return {
+        ...room,
+        totalBeds,
+        availableBeds,
+        blockedBeds,
+        occupiedBeds,
+      };
+    });
+  }, [roomRows.data, bedRows.data]);
+
+  const data = useMemo(
+    () => (semesterId ? { stats, rooms, bookings, payments } : null),
+    [stats, rooms, bookings, payments, semesterId]
+  );
+
+  const loadData = useCallback(() => {}, []);
 
   useEffect(() => {
-    if (semesterId) loadData(semesterId);
-  }, [semesterId, loadData]);
+    setLoading(
+      semesterRows.loading ||
+        roomRows.loading ||
+        bedRows.loading ||
+        (semesterId ? bookingRows.loading || paymentRows.loading : false)
+    );
+  }, [
+    semesterRows.loading,
+    roomRows.loading,
+    bedRows.loading,
+    bookingRows.loading,
+    paymentRows.loading,
+    semesterId,
+  ]);
+
+  useEffect(() => {
+    setError(
+      semesterRows.error ||
+        roomRows.error ||
+        bedRows.error ||
+        bookingRows.error ||
+        paymentRows.error
+    );
+  }, [
+    semesterRows.error,
+    roomRows.error,
+    bedRows.error,
+    bookingRows.error,
+    paymentRows.error,
+  ]);
 
   const derived = useMemo(() => {
     if (!data) return null;
@@ -119,15 +215,17 @@ export default function DashboardPage() {
 
       if (isSchool) {
         schoolStudents.add(b.studentId);
-        schoolRevenue += Number(b.amount) || 0;
+        schoolRevenue += Number(b.price || b.amount) || 0;
       } else {
         regularStudents.add(b.studentId);
-        regularRevenue += Number(b.amount) || 0;
+        regularRevenue += Number(b.price || b.amount) || 0;
       }
-      if (b.status === 'pending') pendingBookings += 1;
+      if (isBookingPending(b.bookingStatus || b.status)) pendingBookings += 1;
     });
 
-    const pendingPayments = payments.filter((p) => p.status === 'pending').length;
+    const pendingPayments = payments.filter(
+      (p) => String(p.status || '').toUpperCase() === 'PENDING'
+    ).length;
 
     const occupancyPie = [
       { name: 'Available', value: stats.availableBeds, color: PIE_COLORS[0] },

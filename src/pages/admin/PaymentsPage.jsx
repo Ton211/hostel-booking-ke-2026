@@ -11,14 +11,16 @@ import {
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import Papa from 'papaparse';
+import { collection, query, where, orderBy } from 'firebase/firestore';
 
+import { db } from '../../firebase/config';
 import DataTable from '../../components/admin/DataTable';
 import Modal from '../../components/admin/Modal';
 import FilterBar from '../../components/admin/FilterBar';
 import StatusBadge from '../../components/admin/StatusBadge';
 import StatCard from '../../components/admin/StatCard';
-import { getPayments } from '../../services/paymentService';
-import { getAllSemesters } from '../../services/semesterService';
+import { useRealtimeQuery } from '../../hooks/useRealtime';
+import { isPaymentPaid } from '../../utils/status';
 
 function fmtDate(value) {
   if (!value) return 'N/A';
@@ -79,55 +81,50 @@ function toExportRows(rows) {
 }
 
 export default function PaymentsPage() {
-  const [semesters, setSemesters] = useState([]);
   const [semesterId, setSemesterId] = useState('');
-  const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const semesterRows = useRealtimeQuery(
+    () => query(collection(db, 'semesters'), orderBy('startDate', 'desc')),
+    []
+  );
+  const paymentRows = useRealtimeQuery(
+    () =>
+      semesterId
+        ? query(
+            collection(db, 'payments'),
+            where('semesterId', '==', semesterId),
+            orderBy('createdAt', 'desc')
+          )
+        : null,
+    [semesterId]
+  );
+
+  useEffect(() => {
+    if (!semesterId && semesterRows.data.length) {
+      const active =
+        semesterRows.data.find((s) => s.isActive && !s.isClosed) ||
+        semesterRows.data[0];
+      setSemesterId(active ? active.id : '');
+    }
+  }, [semesterId, semesterRows.data]);
+
+  const semesters = semesterRows.data;
+  const payments = paymentRows.data;
+  const loadData = useCallback(() => {}, []);
+
+  useEffect(() => {
+    setLoading(semesterRows.loading || (semesterId ? paymentRows.loading : false));
+  }, [semesterRows.loading, paymentRows.loading, semesterId]);
+
+  useEffect(() => {
+    setError(semesterRows.error || paymentRows.error);
+  }, [semesterRows.error, paymentRows.error]);
 
   const [search, setSearch] = useState('');
   const [filters, setFilters] = useState({ status: '', dateFrom: '', dateTo: '' });
   const [detail, setDetail] = useState(null);
-
-  const loadData = useCallback(async (sid) => {
-    if (!sid) return;
-    setLoading(true);
-    setError(null);
-    try {
-      setPayments(await getPayments({ semesterId: sid }));
-    } catch (err) {
-      console.error('Failed to load payments:', err);
-      setError('Failed to load payments. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const list = await getAllSemesters();
-        if (cancelled) return;
-        setSemesters(list);
-        const active = list.find((s) => s.isActive && !s.isClosed) || list[0];
-        setSemesterId(active ? active.id : '');
-      } catch (err) {
-        console.error('Failed to load semesters:', err);
-        if (!cancelled) {
-          setError('Failed to load payments. Please try again.');
-          setLoading(false);
-        }
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (semesterId) loadData(semesterId);
-  }, [semesterId, loadData]);
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
@@ -155,17 +152,20 @@ export default function PaymentsPage() {
   }
 
   const summary = useMemo(() => {
+    const isPaid = (p) => isPaymentPaid(p.status);
+    const statusKey = (p) => String(p.status || '').toUpperCase();
+
     const revenue = payments
-      .filter((p) => p.status === 'completed')
+      .filter(isPaid)
       .reduce((sum, p) => sum + Number(p.amount || 0), 0);
-    const paid = payments
-      .filter((p) => p.status === 'completed')
-      .reduce((sum, p) => sum + Number(p.amount || 0), 0);
-    const paidCount = payments.filter((p) => p.status === 'completed').length;
-    const pending = payments.filter((p) => p.status === 'pending');
+    const paid = revenue;
+    const paidCount = payments.filter(isPaid).length;
+    const pending = payments.filter((p) => statusKey(p) === 'PENDING');
     const pendingCount = pending.length;
     const pendingAmount = pending.reduce((s, p) => s + Number(p.amount || 0), 0);
-    const failed = payments.filter((p) => p.status === 'failed');
+    const failed = payments.filter(
+      (p) => statusKey(p) === 'FAILED' || statusKey(p) === 'REJECTED'
+    );
     const failedCount = failed.length;
     const failedAmount = failed.reduce((s, p) => s + Number(p.amount || 0), 0);
     return { revenue, paid, paidCount, pendingCount, pendingAmount, failedCount, failedAmount };

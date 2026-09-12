@@ -1,14 +1,18 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { Eye, ArrowLeftRight } from 'lucide-react';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { collection, query, orderBy } from 'firebase/firestore';
 
 import { db } from '../../firebase/config';
 import DataTable from '../../components/admin/DataTable';
 import Modal from '../../components/admin/Modal';
 import FilterBar from '../../components/admin/FilterBar';
 import StatusBadge from '../../components/admin/StatusBadge';
-import { getAllSemesters } from '../../services/semesterService';
+import { useRealtimeQuery } from '../../hooks/useRealtime';
+import {
+  isBookingConfirmed,
+  isBookingPending,
+} from '../../utils/status';
 import { getStudent } from '../../services/studentService';
 import { getBookingsByStudent, transferBed } from '../../services/bookingService';
 import { getPaymentsByBooking } from '../../services/paymentService';
@@ -27,27 +31,22 @@ function fmtMoney(n) {
   return 'KSh ' + Number(n || 0).toLocaleString();
 }
 
-async function fetchStudents(semesterId) {
-  const [studentsSnap, bookingsSnap] = await Promise.all([
-    getDocs(query(collection(db, 'students'), orderBy('fullName', 'asc'))),
-    getDocs(collection(db, 'bookings')),
-  ]);
+function isActiveBooking(b) {
+  const st = String(b.bookingStatus || b.status || '').toLowerCase();
+  return isBookingConfirmed(b.bookingStatus || b.status) || st === 'active';
+}
 
-  const bookings = bookingsSnap.docs
-    .map((d) => ({ id: d.id, ...d.data() }))
-    .filter((b) => b.semesterId === semesterId);
+function buildStudents(studentRows, bookingRows, semesterId) {
+  const semesterBookings = bookingRows.filter((b) => b.semesterId === semesterId);
 
   const byStudent = {};
-  bookings.forEach((b) => {
+  semesterBookings.forEach((b) => {
     (byStudent[b.studentId] = byStudent[b.studentId] || []).push(b);
   });
 
-  return studentsSnap.docs.map((d) => {
-    const s = { id: d.id, ...d.data() };
+  return studentRows.map((s) => {
     const sb = byStudent[s.id] || [];
-    const activeBookings = sb.filter((b) =>
-      ['active', 'confirmed'].includes(b.status)
-    );
+    const activeBookings = sb.filter(isActiveBooking);
     return {
       ...s,
       bookings: sb,
@@ -60,11 +59,43 @@ async function fetchStudents(semesterId) {
 }
 
 export default function StudentsPage() {
-  const [semesters, setSemesters] = useState([]);
   const [semesterId, setSemesterId] = useState('');
-  const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const semesterRows = useRealtimeQuery(
+    () => query(collection(db, 'semesters'), orderBy('startDate', 'desc')),
+    []
+  );
+  const studentRows = useRealtimeQuery(
+    () => query(collection(db, 'students'), orderBy('fullName', 'asc')),
+    []
+  );
+  const bookingRows = useRealtimeQuery(() => collection(db, 'bookings'), []);
+
+  useEffect(() => {
+    if (!semesterId && semesterRows.data.length) {
+      const active =
+        semesterRows.data.find((s) => s.isActive && !s.isClosed) ||
+        semesterRows.data[0];
+      setSemesterId(active ? active.id : '');
+    }
+  }, [semesterId, semesterRows.data]);
+
+  const semesters = semesterRows.data;
+  const students = useMemo(
+    () => buildStudents(studentRows.data, bookingRows.data, semesterId),
+    [studentRows.data, bookingRows.data, semesterId]
+  );
+  const loadStudents = useCallback(() => {}, []);
+
+  useEffect(() => {
+    setLoading(semesterRows.loading || studentRows.loading || bookingRows.loading);
+  }, [semesterRows.loading, studentRows.loading, bookingRows.loading]);
+
+  useEffect(() => {
+    setError(semesterRows.error || studentRows.error || bookingRows.error);
+  }, [semesterRows.error, studentRows.error, bookingRows.error]);
 
   const [search, setSearch] = useState('');
   const [filters, setFilters] = useState({ gender: '', bookingStatus: '' });
@@ -79,50 +110,6 @@ export default function StudentsPage() {
   const [transferBedId, setTransferBedId] = useState('');
   const [transferBusy, setTransferBusy] = useState(false);
 
-  const loadStudents = useCallback(
-    async (sid) => {
-      if (!sid) return;
-      setLoading(true);
-      setError(null);
-      try {
-        const list = await fetchStudents(sid);
-        setStudents(list);
-      } catch (err) {
-        console.error('Failed to load students:', err);
-        setError('Failed to load students. Please try again.');
-      } finally {
-        setLoading(false);
-      }
-    },
-    []
-  );
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const list = await getAllSemesters();
-        if (cancelled) return;
-        setSemesters(list);
-        const active = list.find((s) => s.isActive && !s.isClosed) || list[0];
-        setSemesterId(active ? active.id : '');
-      } catch (err) {
-        console.error('Failed to load semesters:', err);
-        if (!cancelled) {
-          setError('Failed to load students. Please try again.');
-          setLoading(false);
-        }
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (semesterId) loadStudents(semesterId);
-  }, [semesterId, loadStudents]);
-
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
     return students.filter((s) => {
@@ -136,9 +123,13 @@ export default function StudentsPage() {
       if (filters.bookingStatus === 'active')
         matchesBooking = s.hasActiveBooking;
       else if (filters.bookingStatus === 'confirmed')
-        matchesBooking = s.bookings.some((b) => b.status === 'confirmed');
+        matchesBooking = s.bookings.some((b) =>
+          isBookingConfirmed(b.bookingStatus || b.status)
+        );
       else if (filters.bookingStatus === 'pending')
-        matchesBooking = s.bookings.some((b) => b.status === 'pending');
+        matchesBooking = s.bookings.some((b) =>
+          isBookingPending(b.bookingStatus || b.status)
+        );
       else if (filters.bookingStatus === 'none')
         matchesBooking = s.bookingsCount === 0;
       return matchesSearch && matchesGender && matchesBooking;

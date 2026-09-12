@@ -5,7 +5,12 @@ import {
   where,
 } from 'firebase/firestore';
 import { db } from '../firebase/config';
-import { isPaymentPaid } from '../utils/status';
+import {
+  isBedAvailable,
+  isBedOccupied,
+  isBedBlocked,
+  isPaymentPaid,
+} from '../utils/status';
 
 function serialize(docSnap) {
   return { id: docSnap.id, ...docSnap.data() };
@@ -34,9 +39,9 @@ export async function getDashboardStats(semesterId) {
 
   const totalRooms = rooms.length;
   const totalBeds = beds.length;
-  const availableBeds = beds.filter((b) => b.status === 'AVAILABLE').length;
-  const occupiedBeds = beds.filter((b) => b.status === 'BOOKED').length;
-  const blockedBeds = beds.filter((b) => b.status === 'BLOCKED').length;
+  const availableBeds = beds.filter((b) => isBedAvailable(b.status)).length;
+  const occupiedBeds = beds.filter((b) => isBedOccupied(b.status)).length;
+  const blockedBeds = beds.filter((b) => isBedBlocked(b.status)).length;
 
   const totalBookings = bookings.length;
   const confirmedBookings = bookings.filter(
@@ -92,14 +97,14 @@ export async function getOccupancyStats() {
 
     const roomBeds = beds.filter((b) => b.roomId === room.id);
     hostelStats[room.hostelId].totalBeds += roomBeds.length;
-    hostelStats[room.hostelId].availableBeds += roomBeds.filter(
-      (b) => b.status === 'AVAILABLE'
+    hostelStats[room.hostelId].availableBeds += roomBeds.filter((b) =>
+      isBedAvailable(b.status)
     ).length;
-    hostelStats[room.hostelId].occupiedBeds += roomBeds.filter(
-      (b) => b.status === 'BOOKED'
+    hostelStats[room.hostelId].occupiedBeds += roomBeds.filter((b) =>
+      isBedOccupied(b.status)
     ).length;
-    hostelStats[room.hostelId].blockedBeds += roomBeds.filter(
-      (b) => b.status === 'BLOCKED'
+    hostelStats[room.hostelId].blockedBeds += roomBeds.filter((b) =>
+      isBedBlocked(b.status)
     ).length;
   }
 
@@ -112,14 +117,14 @@ export async function getOccupancyStats() {
   }));
 
   const totalBeds = beds.length;
-  const occupiedBeds = beds.filter((b) => b.status === 'BOOKED').length;
+  const occupiedBeds = beds.filter((b) => isBedOccupied(b.status)).length;
 
   return {
     overall: {
       totalBeds,
       occupiedBeds,
-      availableBeds: beds.filter((b) => b.status === 'AVAILABLE').length,
-      blockedBeds: beds.filter((b) => b.status === 'BLOCKED').length,
+      availableBeds: beds.filter((b) => isBedAvailable(b.status)).length,
+      blockedBeds: beds.filter((b) => isBedBlocked(b.status)).length,
       occupancyRate:
         totalBeds > 0
           ? Number(((occupiedBeds / totalBeds) * 100).toFixed(1))

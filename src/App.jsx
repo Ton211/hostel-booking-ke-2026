@@ -1,31 +1,31 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import LoadingSpinner from './components/common/LoadingSpinner';
 import ErrorBoundary from './components/common/ErrorBoundary';
 
 // Student pages
-import HomePage from './pages/student/HomePage';
-import BookingPage from './pages/student/BookingPage';
-import BookingLookupPage from './pages/student/BookingLookupPage';
+const HomePage = lazy(() => import('./pages/student/HomePage'));
+const BookingPage = lazy(() => import('./pages/student/BookingPage'));
+const BookingLookupPage = lazy(() => import('./pages/student/BookingLookupPage'));
 
 // Admin pages
-import AdminLayout from './pages/admin/AdminLayout';
-import DashboardPage from './pages/admin/DashboardPage';
-import RoomsPage from './pages/admin/RoomsPage';
-import BedsPage from './pages/admin/BedsPage';
-import StudentsPage from './pages/admin/StudentsPage';
-import BookingsPage from './pages/admin/BookingsPage';
-import PaymentsPage from './pages/admin/PaymentsPage';
-import SemestersPage from './pages/admin/SemestersPage';
-import AccommodationTypesPage from './pages/admin/AccommodationTypesPage';
-import AdminsPage from './pages/admin/AdminsPage';
-import SettingsPage from './pages/admin/SettingsPage';
-import AuditLogsPage from './pages/admin/AuditLogsPage';
-import ReportsPage from './pages/admin/ReportsPage';
+const AdminLayout = lazy(() => import('./pages/admin/AdminLayout'));
+const DashboardPage = lazy(() => import('./pages/admin/DashboardPage'));
+const RoomsPage = lazy(() => import('./pages/admin/RoomsPage'));
+const BedsPage = lazy(() => import('./pages/admin/BedsPage'));
+const StudentsPage = lazy(() => import('./pages/admin/StudentsPage'));
+const BookingsPage = lazy(() => import('./pages/admin/BookingsPage'));
+const PaymentsPage = lazy(() => import('./pages/admin/PaymentsPage'));
+const SemestersPage = lazy(() => import('./pages/admin/SemestersPage'));
+const AccommodationTypesPage = lazy(() => import('./pages/admin/AccommodationTypesPage'));
+const AdminsPage = lazy(() => import('./pages/admin/AdminsPage'));
+const SettingsPage = lazy(() => import('./pages/admin/SettingsPage'));
+const AuditLogsPage = lazy(() => import('./pages/admin/AuditLogsPage'));
+const ReportsPage = lazy(() => import('./pages/admin/ReportsPage'));
 
 // Auth page
-import LoginPage from './pages/admin/LoginPage';
+const LoginPage = lazy(() => import('./pages/admin/LoginPage'));
 
 function ProtectedRoute({ children }) {
   const { currentUser, loading } = useAuth();
@@ -45,34 +45,40 @@ function AdminRoute({ children }) {
 function App() {
   return (
     <ErrorBoundary>
-      <Routes>
-        {/* Public Student Routes */}
-        <Route path="/" element={<HomePage />} />
-        <Route path="/book" element={<BookingPage />} />
-        <Route path="/check-booking" element={<BookingLookupPage />} />
+      <Suspense
+        fallback={
+          <LoadingSpinner fullPage message="Loading..." />
+        }
+      >
+        <Routes>
+          {/* Public Student Routes */}
+          <Route path="/" element={<HomePage />} />
+          <Route path="/book" element={<BookingPage />} />
+          <Route path="/check-booking" element={<BookingLookupPage />} />
 
-        {/* Admin Login */}
-        <Route path="/admin/login" element={<LoginPage />} />
+          {/* Admin Login */}
+          <Route path="/admin/login" element={<LoginPage />} />
 
-        {/* Protected Admin Routes */}
-        <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
-          <Route index element={<DashboardPage />} />
-          <Route path="rooms" element={<RoomsPage />} />
-          <Route path="beds" element={<BedsPage />} />
-          <Route path="students" element={<StudentsPage />} />
-          <Route path="bookings" element={<BookingsPage />} />
-          <Route path="payments" element={<PaymentsPage />} />
-          <Route path="semesters" element={<SemestersPage />} />
-          <Route path="accommodation-types" element={<AccommodationTypesPage />} />
-          <Route path="admins" element={<AdminsPage />} />
-          <Route path="settings" element={<SettingsPage />} />
-          <Route path="audit-logs" element={<AuditLogsPage />} />
-          <Route path="reports" element={<ReportsPage />} />
-        </Route>
+          {/* Protected Admin Routes */}
+          <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
+            <Route index element={<DashboardPage />} />
+            <Route path="rooms" element={<RoomsPage />} />
+            <Route path="beds" element={<BedsPage />} />
+            <Route path="students" element={<StudentsPage />} />
+            <Route path="bookings" element={<BookingsPage />} />
+            <Route path="payments" element={<PaymentsPage />} />
+            <Route path="semesters" element={<SemestersPage />} />
+            <Route path="accommodation-types" element={<AccommodationTypesPage />} />
+            <Route path="admins" element={<AdminsPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+            <Route path="audit-logs" element={<AuditLogsPage />} />
+            <Route path="reports" element={<ReportsPage />} />
+          </Route>
 
-        {/* Catch-all */}
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
+          {/* Catch-all */}
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </Suspense>
     </ErrorBoundary>
   );
 }

@@ -1,14 +1,14 @@
-import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { Plus, Ban, Unlock } from 'lucide-react';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { collection, query, orderBy, where } from 'firebase/firestore';
 
 import { db } from '../../firebase/config';
 import RoomVisual from '../../components/admin/RoomVisual';
 import Modal from '../../components/admin/Modal';
 import StatusBadge from '../../components/admin/StatusBadge';
 import FilterBar from '../../components/admin/FilterBar';
-import { getAllHostels } from '../../services/hostelService';
+import { useRealtimeQuery } from '../../hooks/useRealtime';
 import {
   blockBed,
   unblockBed,
@@ -16,37 +16,30 @@ import {
   updateBed,
 } from '../../services/bedService';
 
-async function fetchRoomsAndBeds() {
-  const [roomsSnap, bedsSnap, bookingsSnap, hostels] = await Promise.all([
-    getDocs(query(collection(db, 'rooms'), orderBy('name', 'asc'))),
-    getDocs(collection(db, 'beds')),
-    getDocs(collection(db, 'bookings')),
-    getAllHostels(),
-  ]);
-
-  const rooms = roomsSnap.docs
-    .map((d) => ({ id: d.id, ...d.data() }))
-    .filter((r) => r.isActive !== false);
-
+function buildRoomBeds(roomRows, bedRows, bookingRows) {
   const bookingMap = {};
-  bookingsSnap.docs.forEach((d) => {
-    const b = d.data();
+  bookingRows.forEach((b) => {
     const bookingStatus = b.bookingStatus || b.status;
-    if (['CONFIRMED', 'PENDING_PAYMENT', 'confirmed', 'active', 'pending'].includes(bookingStatus)) {
+    if (
+      ['CONFIRMED', 'PENDING_PAYMENT', 'confirmed', 'active', 'pending'].includes(
+        bookingStatus
+      )
+    ) {
       if (b.bedId && !bookingMap[b.bedId]) {
         bookingMap[b.bedId] = {
           studentName: b.studentName || b.student?.name || 'N/A',
           reference: b.bookingReference || b.reference,
-          bookingId: d.id,
+          bookingId: b.id,
           status: bookingStatus,
         };
       }
     }
   });
 
-  const beds = bedsSnap.docs
-    .map((d) => {
-      const bed = { id: d.id, ...d.data() };
+  const rooms = roomRows.filter((r) => r.isActive !== false);
+
+  const beds = bedRows
+    .map((bed) => {
       const info = bookingMap[bed.id];
       return {
         ...bed,
@@ -58,19 +51,39 @@ async function fetchRoomsAndBeds() {
     })
     .filter((b) => b.isActive !== false);
 
-  const roomBeds = rooms.map((room) => ({
+  return rooms.map((room) => ({
     ...room,
     beds: beds.filter((b) => b.roomId === room.id),
   }));
-
-  return { roomBeds, hostels };
 }
 
 export default function BedsPage() {
-  const [roomBeds, setRoomBeds] = useState([]);
-  const [hostels, setHostels] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const roomRows = useRealtimeQuery(
+    () => query(collection(db, 'rooms'), orderBy('name', 'asc')),
+    []
+  );
+  const bedRows = useRealtimeQuery(() => collection(db, 'beds'), []);
+  const bookingRows = useRealtimeQuery(() => collection(db, 'bookings'), []);
+  const hostelsRows = useRealtimeQuery(
+    () =>
+      query(
+        collection(db, 'hostels'),
+        where('isActive', '==', true),
+        orderBy('name', 'asc')
+      ),
+    []
+  );
+
+  const roomBeds = useMemo(
+    () => buildRoomBeds(roomRows.data, bedRows.data, bookingRows.data),
+    [roomRows.data, bedRows.data, bookingRows.data]
+  );
+  const hostels = hostelsRows.data;
+  const loading =
+    roomRows.loading || bedRows.loading || bookingRows.loading || hostelsRows.loading;
+  const error =
+    roomRows.error || bedRows.error || bookingRows.error || hostelsRows.error;
+  const loadData = useCallback(() => {}, []);
 
   const [search, setSearch] = useState('');
   const [filters, setFilters] = useState({
@@ -84,25 +97,6 @@ export default function BedsPage() {
   const [addBedRoom, setAddBedRoom] = useState(null);
   const [addForm, setAddForm] = useState({ bedNumber: 1, position: 'UP' });
   const [saving, setSaving] = useState(false);
-
-  const loadData = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const { roomBeds: rb, hostels: h } = await fetchRoomsAndBeds();
-      setRoomBeds(rb);
-      setHostels(h);
-    } catch (err) {
-      console.error('Failed to load beds:', err);
-      setError('Failed to load beds. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
 
   const allBeds = useMemo(
     () => roomBeds.flatMap((room) => room.beds),

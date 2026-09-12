@@ -1,7 +1,7 @@
-import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { Plus, Pencil, Power, Eye, ChevronDown, ChevronUp } from 'lucide-react';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { Plus, Pencil, Power, Eye, ChevronUp } from 'lucide-react';
+import { collection, query, orderBy, where } from 'firebase/firestore';
 
 import { db } from '../../firebase/config';
 import DataTable from '../../components/admin/DataTable';
@@ -9,7 +9,7 @@ import Modal from '../../components/admin/Modal';
 import ConfirmDialog from '../../components/admin/ConfirmDialog';
 import StatusBadge from '../../components/admin/StatusBadge';
 import FilterBar from '../../components/admin/FilterBar';
-import { getAllHostels } from '../../services/hostelService';
+import { useRealtimeQuery } from '../../hooks/useRealtime';
 import {
   createRoom,
   updateRoom,
@@ -25,17 +25,9 @@ function deriveRoomStatus(room, beds) {
   return 'partial';
 }
 
-async function fetchAllRoomsWithBeds() {
-  const [roomsSnap, bedsSnap, hostels] = await Promise.all([
-    getDocs(query(collection(db, 'rooms'), orderBy('name', 'asc'))),
-    getDocs(collection(db, 'beds')),
-    getAllHostels(),
-  ]);
-  const allBeds = bedsSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
-
-  const rooms = roomsSnap.docs.map((d) => {
-    const room = { id: d.id, ...d.data() };
-    const beds = allBeds.filter((b) => b.roomId === room.id);
+function buildRooms(roomRows, bedRows) {
+  return roomRows.map((room) => {
+    const beds = bedRows.filter((b) => b.roomId === room.id);
     const occupied = beds.filter((b) => b.status === 'occupied').length;
     const available = beds.filter((b) => b.status === 'available').length;
     const blocked = beds.filter((b) => b.status === 'blocked').length;
@@ -49,17 +41,34 @@ async function fetchAllRoomsWithBeds() {
       status: deriveRoomStatus(room, beds),
     };
   });
-
-  return { rooms, allBeds, hostels };
 }
 
 const emptyForm = { name: '', hostelId: '', gender: '', bedCount: 1 };
 
 export default function RoomsPage() {
-  const [rooms, setRooms] = useState([]);
-  const [hostels, setHostels] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const roomsRows = useRealtimeQuery(
+    () => query(collection(db, 'rooms'), orderBy('name', 'asc')),
+    []
+  );
+  const bedRows = useRealtimeQuery(() => collection(db, 'beds'), []);
+  const hostelsRows = useRealtimeQuery(
+    () =>
+      query(
+        collection(db, 'hostels'),
+        where('isActive', '==', true),
+        orderBy('name', 'asc')
+      ),
+    []
+  );
+
+  const rooms = useMemo(
+    () => buildRooms(roomsRows.data, bedRows.data),
+    [roomsRows.data, bedRows.data]
+  );
+  const hostels = hostelsRows.data;
+  const loading = roomsRows.loading || bedRows.loading || hostelsRows.loading;
+  const error = roomsRows.error || bedRows.error || hostelsRows.error;
+  const loadData = useCallback(() => {}, []);
 
   const [search, setSearch] = useState('');
   const [filters, setFilters] = useState({ gender: '', hostel: '', status: '' });
@@ -73,25 +82,6 @@ export default function RoomsPage() {
 
   const [deactivateTarget, setDeactivateTarget] = useState(null);
   const [expandedRoomId, setExpandedRoomId] = useState(null);
-
-  const loadData = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const { rooms: r, hostels: h } = await fetchAllRoomsWithBeds();
-      setRooms(r);
-      setHostels(h);
-    } catch (err) {
-      console.error('Failed to load rooms:', err);
-      setError('Failed to load rooms. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();

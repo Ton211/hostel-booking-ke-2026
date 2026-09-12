@@ -1,21 +1,21 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { Eye, XCircle, ArrowLeftRight } from 'lucide-react';
+import { collection, query, where, orderBy } from 'firebase/firestore';
 
+import { db } from '../../firebase/config';
 import DataTable from '../../components/admin/DataTable';
 import Modal from '../../components/admin/Modal';
 import ConfirmDialog from '../../components/admin/ConfirmDialog';
 import FilterBar from '../../components/admin/FilterBar';
 import StatusBadge from '../../components/admin/StatusBadge';
-import { getAllSemesters } from '../../services/semesterService';
+import { useRealtimeQuery } from '../../hooks/useRealtime';
 import {
-  getBookingsBySemester,
   cancelBooking,
   transferBed,
 } from '../../services/bookingService';
 import { getRoomsWithAvailability } from '../../services/roomService';
 import { getAvailableBeds } from '../../services/bedService';
-import { getAllTypes } from '../../services/accommodationService';
 
 function fmtDate(value) {
   if (!value) return 'N/A';
@@ -46,12 +46,53 @@ function getPaymentStatus(booking) {
 }
 
 export default function BookingsPage() {
-  const [semesters, setSemesters] = useState([]);
   const [semesterId, setSemesterId] = useState('');
-  const [types, setTypes] = useState([]);
-  const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const semesterRows = useRealtimeQuery(
+    () => query(collection(db, 'semesters'), orderBy('startDate', 'desc')),
+    []
+  );
+  const bookingRows = useRealtimeQuery(
+    () =>
+      semesterId
+        ? query(
+            collection(db, 'bookings'),
+            where('semesterId', '==', semesterId),
+            orderBy('createdAt', 'desc')
+          )
+        : null,
+    [semesterId]
+  );
+  const typeRows = useRealtimeQuery(
+    () => query(collection(db, 'accommodationTypes'), orderBy('name', 'asc')),
+    []
+  );
+
+  useEffect(() => {
+    if (!semesterId && semesterRows.data.length) {
+      const active =
+        semesterRows.data.find((s) => s.isActive && !s.isClosed) ||
+        semesterRows.data[0];
+      setSemesterId(active ? active.id : '');
+    }
+  }, [semesterId, semesterRows.data]);
+
+  const semesters = semesterRows.data;
+  const types = typeRows.data;
+  const bookings = bookingRows.data;
+  const loadData = useCallback(() => {}, []);
+
+  useEffect(() => {
+    setLoading(
+      semesterRows.loading || typeRows.loading || (semesterId ? bookingRows.loading : false)
+    );
+  }, [semesterRows.loading, typeRows.loading, bookingRows.loading, semesterId]);
+
+  useEffect(() => {
+    setError(semesterRows.error || typeRows.error || bookingRows.error);
+  }, [semesterRows.error, typeRows.error, bookingRows.error]);
 
   const [search, setSearch] = useState('');
   const [filters, setFilters] = useState({
@@ -70,51 +111,6 @@ export default function BookingsPage() {
   const [transferBeds, setTransferBeds] = useState([]);
   const [transferBedId, setTransferBedId] = useState('');
   const [transferBusy, setTransferBusy] = useState(false);
-
-  const loadData = useCallback(async (sid) => {
-    if (!sid) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const [bookingList, accommodationTypes] = await Promise.all([
-        getBookingsBySemester(sid),
-        getAllTypes(),
-      ]);
-      setBookings(bookingList);
-      setTypes(accommodationTypes);
-    } catch (err) {
-      console.error('Failed to load bookings:', err);
-      setError('Failed to load bookings. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const list = await getAllSemesters();
-        if (cancelled) return;
-        setSemesters(list);
-        const active = list.find((s) => s.isActive && !s.isClosed) || list[0];
-        setSemesterId(active ? active.id : '');
-      } catch (err) {
-        console.error('Failed to load semesters:', err);
-        if (!cancelled) {
-          setError('Failed to load bookings. Please try again.');
-          setLoading(false);
-        }
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (semesterId) loadData(semesterId);
-  }, [semesterId, loadData]);
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
