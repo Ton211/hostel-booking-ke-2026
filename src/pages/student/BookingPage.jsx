@@ -13,7 +13,7 @@ import BookingSummary from '../../components/student/BookingSummary';
 import BookingConfirmation from '../../components/student/BookingConfirmation';
 
 import { getType } from '../../services/accommodationService';
-import { createBooking } from '../../services/bookingService';
+import { createBookingWithStk } from '../../services/bookingService';
 import { getActiveSemester } from '../../services/semesterService';
 
 import { signInAnonymously } from 'firebase/auth';
@@ -171,7 +171,7 @@ export default function BookingPage() {
         accommodationTypeId,
       };
 
-      const result = await createBooking(payload);
+      const result = await createBookingWithStk(payload);
 
       setConfirmationData({
         ...result,

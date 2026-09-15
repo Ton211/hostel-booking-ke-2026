@@ -12,6 +12,7 @@ import {
   serverTimestamp,
 } from 'firebase/firestore';
 import { app, db, firebaseReady } from '../firebase/config';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 
 const COLLECTION = 'bookings';
 
@@ -29,6 +30,14 @@ function generateBookingReference() {
   const year = new Date().getFullYear();
   const randomPart = Math.random().toString(36).substring(2, 7).toUpperCase();
   return `HOST-${year}-${randomPart}`;
+}
+
+export async function createBookingWithStk(data) {
+  assertReady();
+  const funcs = getFunctions(app);
+  const callable = httpsCallable(funcs, 'createBooking');
+  const response = await callable(data);
+  return response.data;
 }
 
 export async function createBooking(data) {

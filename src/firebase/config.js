@@ -1,10 +1,12 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
 import { getAuth, connectAuthEmulator } from 'firebase/auth';
+import { getFunctions } from 'firebase/functions';
 
 let app = null;
 let db = null;
 let auth = null;
+let functions = null;
 let firebaseReady = false;
 
 try {
@@ -21,6 +23,7 @@ try {
     app = initializeApp(firebaseConfig);
     db = getFirestore(app);
     auth = getAuth(app);
+    functions = getFunctions(app);
     firebaseReady = true;
   } else {
     console.warn('Firebase not configured. Running in offline mode. Add your Firebase credentials to .env');
@@ -29,4 +32,4 @@ try {
   console.warn('Firebase initialization failed:', error.message);
 }
 
-export { app, db, auth, firebaseReady };
+export { app, db, auth, functions, firebaseReady };
