@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Loader2, Bed } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -23,11 +23,14 @@ const STEPS = ['Gender', 'Accommodation', 'Room', 'Bed', 'Details', 'Payment', '
 
 export default function BookingPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const urlAccommodation = searchParams.get('accommodation');
   const [currentStep, setCurrentStep] = useState(0);
 
   const [gender, setGender] = useState(null);
   const [accommodationTypeId, setAccommodationTypeId] = useState(null);
   const [accommodationType, setAccommodationType] = useState(null);
+  const [skipAccommodation, setSkipAccommodation] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [selectedBed, setSelectedBed] = useState(null);
   const [details, setDetails] = useState({
@@ -69,6 +72,19 @@ export default function BookingPage() {
     }
   }, [accommodationTypeId]);
 
+  useEffect(() => {
+    if (!urlAccommodation) return;
+    (async () => {
+      try {
+        await getType(urlAccommodation);
+        setAccommodationTypeId(urlAccommodation);
+        setSkipAccommodation(true);
+      } catch {
+        setSkipAccommodation(false);
+      }
+    })();
+  }, [urlAccommodation]);
+
   function goNext() {
     if (currentStep === 0 && !gender) {
       toast.error('Please select your gender');
@@ -94,11 +110,19 @@ export default function BookingPage() {
         return;
       }
     }
-    setCurrentStep((prev) => Math.min(prev + 1, STEPS.length - 1));
+    setCurrentStep((prev) => {
+      let next = Math.min(prev + 1, STEPS.length - 1);
+      if (skipAccommodation && next === 1) next = 2;
+      return next;
+    });
   }
 
   function goBack() {
-    setCurrentStep((prev) => Math.max(prev - 1, 0));
+    setCurrentStep((prev) => {
+      let prevStep = Math.max(prev - 1, 0);
+      if (skipAccommodation && prevStep === 1) prevStep = 0;
+      return prevStep;
+    });
   }
 
   function handleGenderSelect(value) {
@@ -236,6 +260,12 @@ export default function BookingPage() {
   const showNavigation = currentStep < 5;
   const showBack = currentStep > 0 && currentStep < 6;
 
+  const displaySteps = skipAccommodation
+    ? STEPS.filter((_, index) => index !== 1)
+    : STEPS;
+  const displayStepIndex =
+    skipAccommodation && currentStep > 1 ? currentStep - 1 : currentStep;
+
   return (
     <div className="min-h-screen bg-stone-50">
       <header className="bg-white border-b border-stone-200 sticky top-0 z-10">
@@ -250,18 +280,18 @@ export default function BookingPage() {
           )}
           <div className="flex items-center gap-2">
             <Bed className="w-5 h-5 text-clay-600" />
-            <span className="font-semibold text-stone-800 text-sm">Book a Bed</span>
+            <span className="font-semibold text-stone-800 text-sm">Book a Room</span>
           </div>
           {currentStep < 6 && (
-            <span className="ml-auto text-xs text-stone-400">
-              Step {currentStep + 1} of {STEPS.length}
-            </span>
+<span className="ml-auto text-xs text-stone-400">
+            Step {displayStepIndex + 1} of {displaySteps.length}
+          </span>
           )}
         </div>
       </header>
 
       <div className="max-w-3xl mx-auto px-4">
-        <ProgressBar steps={STEPS} currentStep={currentStep} />
+        <ProgressBar steps={displaySteps} currentStep={displayStepIndex} />
       </div>
 
       <main className="max-w-3xl mx-auto px-4 py-6 pb-24">

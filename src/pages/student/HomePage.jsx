@@ -63,7 +63,7 @@ export default function HomePage() {
             className="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-clay-600 text-white font-semibold rounded-xl hover:bg-clay-700 shadow-lg shadow-clay-100 transition-all duration-200"
           >
             <Bed className="w-5 h-5" />
-            Book a Bed
+            Book a Room
             <ArrowRight className="w-4 h-4" />
           </Link>
           <Link
@@ -89,9 +89,10 @@ export default function HomePage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {accommodations.map((acc) => (
-              <div
+              <Link
                 key={acc.id}
-                className="bg-white rounded-xl border border-stone-200 shadow-sm p-6 hover:shadow-md transition"
+                to={`/book?accommodation=${acc.id}`}
+                className="bg-white rounded-xl border border-stone-200 shadow-sm p-6 hover:shadow-md hover:border-clay-300 transition"
               >
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-lg bg-clay-100 flex items-center justify-center">
@@ -106,7 +107,7 @@ export default function HomePage() {
                   KSh {Number(acc.price).toLocaleString()}
                 </div>
                 <p className="text-xs text-stone-400 mt-1">per semester</p>
-              </div>
+              </Link>
             ))}
           </div>
         )}
