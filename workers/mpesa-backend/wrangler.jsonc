@@ -1,0 +1,10 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "hostel-mpesa-backend",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-15",
+  "workers_dev": true,
+  "vars": {
+    "MPESA_ENVIRONMENT": "sandbox"
+  }
+}

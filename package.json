@@ -7,7 +7,9 @@
     "start": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0"
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "worker:dev": "wrangler dev --config workers/mpesa-backend/wrangler.jsonc",
+    "worker:deploy": "wrangler deploy --config workers/mpesa-backend/wrangler.jsonc"
   },
   "dependencies": {
     "date-fns": "^3.6.0",

@@ -13,7 +13,7 @@ import BookingSummary from '../../components/student/BookingSummary';
 import BookingConfirmation from '../../components/student/BookingConfirmation';
 
 import { getType } from '../../services/accommodationService';
-import { createBookingWithStk } from '../../services/bookingService';
+import { createBooking, initiateMpesaStkPush } from '../../services/bookingService';
 import { getActiveSemester } from '../../services/semesterService';
 
 import { signInAnonymously } from 'firebase/auth';
@@ -171,7 +171,19 @@ export default function BookingPage() {
         accommodationTypeId,
       };
 
-      const result = await createBookingWithStk(payload);
+      const result = await createBooking(payload);
+
+      let stkPushStatus = null;
+      try {
+        const stk = await initiateMpesaStkPush({
+          bookingReference: result.bookingReference,
+          phoneNumber: details.mpesaPhone || details.phoneNumber,
+          amount: result.price,
+        });
+        stkPushStatus = stk.customerMessage || stk.responseDescription || 'Check your phone for the M-Pesa payment prompt';
+      } catch (stkError) {
+        stkPushStatus = `Booking created but M-Pesa prompt failed: ${stkError.message}`;
+      }
 
       setConfirmationData({
         ...result,
@@ -181,6 +193,7 @@ export default function BookingPage() {
         roomName: selectedRoom.name,
         bedName: `Bed ${selectedBed.bedNumber || selectedBed.name}`,
         bedPosition: selectedBed.position || '',
+        stkPushStatus,
       });
 
       setCurrentStep(6);

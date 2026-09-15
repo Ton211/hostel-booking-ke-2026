@@ -12,7 +12,6 @@ import {
   serverTimestamp,
 } from 'firebase/firestore';
 import { app, db, firebaseReady } from '../firebase/config';
-import { getFunctions, httpsCallable } from 'firebase/functions';
 
 const COLLECTION = 'bookings';
 
@@ -32,12 +31,24 @@ function generateBookingReference() {
   return `HOST-${year}-${randomPart}`;
 }
 
-export async function createBookingWithStk(data) {
-  assertReady();
-  const funcs = getFunctions(app);
-  const callable = httpsCallable(funcs, 'createBooking');
-  const response = await callable(data);
-  return response.data;
+export async function initiateMpesaStkPush({ bookingReference, phoneNumber, amount }) {
+  const apiUrl = import.meta.env.VITE_MPESA_API_URL;
+  if (!apiUrl) {
+    throw new Error('M-Pesa backend is not configured. Please contact the administrator.');
+  }
+
+  const response = await fetch(`${apiUrl.replace(/\/$/, '')}/api/stkpush`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ bookingReference, phoneNumber, amount }),
+  });
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.error || 'Failed to initiate M-Pesa payment');
+  }
+
+  return data;
 }
 
 export async function createBooking(data) {
